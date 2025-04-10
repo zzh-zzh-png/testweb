@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>解题思维可视化 - 三重积分对称性</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #3f72af;
+            --secondary: #6c9bcf;
+            --accent: #ff7f50;
+            --success: #4CAF50;
+            --warning: #FFC107;
+            --background: #f9f7f7;
+            --card-bg: linear-gradient(135deg, #ffffff 0%, #f8faff 100%);
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui;
+        }
+
+        body {
+            background: var(--background);
+            margin: 0;
+            padding: 60px 20px 100px;
+            min-height: 100vh;
+        }
+
+        /* 返回按钮 */
+        .back-button {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: var(--primary);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            cursor: pointer;
+            z-index: 100;
+            transition: 0.3s;
+        }
+
+        .back-button:hover {
+            transform: translateY(-2px);
+            background: var(--secondary);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 30px;
+        }
+
+        /* 思维导图侧边栏 */
+        .sidebar {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+            position: sticky;
+            top: 80px;
+            border: 1px solid rgba(63,114,175,0.1);
+        }
+
+        .mindmap {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+            position: relative;
+        }
+
+        .node {
+            background: white;
+            border-left: 4px solid var(--secondary);
+            border-radius: 12px;
+            padding: 18px;
+            box-shadow: 0 4px 12px rgba(63,114,175,0.1);
+            transition: 0.3s;
+            position: relative;
+            min-height: 120px;
+        }
+
+        .node::before {
+            content: "";
+            position: absolute;
+            left: -20px;
+            top: 50%;
+            width: 20px;
+            height: 2px;
+            background: var(--secondary);
+        }
+
+        .node.active {
+            border-color: var(--accent);
+            background: linear-gradient(135deg, #fff 0%, #f8faff 100%);
+        }
+
+        .node:nth-child(1)::before { display: none; }
+
+        /* 主解题区 */
+        .main-area {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+            position: relative;
+            border: 1px solid rgba(63,114,175,0.1);
+        }
+
+        .thinking-process {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            padding: 20px;
+        }
+
+        .step-card {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            transition: 0.3s;
+            border: 2px solid rgba(108,155,207,0.2);
+        }
+
+        .step-card.active {
+            border-color: var(--accent);
+            box-shadow: 0 8px 16px rgba(255,127,80,0.1);
+        }
+
+        .step-progress {
+            height: 6px;
+            background: rgba(63,114,175,0.1);
+            margin: 15px 0;
+            border-radius: 3px;
+        }
+
+        .step-progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            border-radius: 3px;
+        }
+
+        .formula-box {
+            background: rgba(108,155,207,0.05);
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            color: var(--primary);
+            border: 1px dashed rgba(63,114,175,0.2);
+        }
+
+        /* 底部导航 */
+        .nav-container {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            padding: 15px 0;
+            box-shadow: 0 -4px 15px rgba(0,0,0,0.08);
+            border-top: 2px solid var(--primary);
+        }
+
+        .nav-items {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-around;
+        }
+
+        .nav-item {
+            text-align: center;
+            color: var(--primary);
+            padding: 10px 25px;
+            border-radius: 30px;
+            transition: 0.3s;
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .nav-item.active {
+            background: rgba(63,114,175,0.1);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+            .node::before { display: none; }
+            .step-card { min-width: 100%; }
+        }
+    </style>
+</head>
+<body>
+    <!-- 返回按钮 -->
+    <div class="back-button" onclick="history.back()">
+        <i class="fas fa-arrow-left"></i>
+    </div>
+
+    <div class="container">
+        <!-- 思维导图侧边栏 -->
+        <div class="sidebar">
+            <h3 style="color: var(--primary); margin-bottom: 25px;">
+                <i class="fas fa-project-diagram"></i> 思维路径
+            </h3>
+            <div class="mindmap">
+                <div class="node active">
+                    <h4 style="color: var(--accent);">问题分析</h4>
+                    <p>识别积分区域对称性特征</p>
+                    <div class="step-progress">
+                        <div class="step-progress-bar" style="width: 100%"></div>
+                    </div>
+                </div>
+
+                <div class="node">
+                    <h4>方法选择</h4>
+                    <ul style="color: var(--primary);">
+                        <li><i class="fas fa-shapes" style="color: var(--secondary);"></i> 坐标系选择</li>
+                        <li><i class="fas fa-magic" style="color: var(--success);"></i> 对称性应用</li>
+                    </ul>
+                </div>
+
+                <div class="node">
+                    <h4>计算执行</h4>
+                    <div class="formula-box">
+                        ∭<sub>Ω</sub>(x²+y²)dV = ?
+                    </div>
+                </div>
+
+                <div class="node">
+                    <h4>验证优化</h4>
+                    <p style="color: var(--warning);"><i class="fas fa-exclamation-triangle"></i> 常见错误检查</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 主解题区 -->
+        <div class="main-area">
+            <h2 style="color: var(--primary); border-left: 4px solid var(--accent); padding-left: 20px;">
+                <i class="fas fa-brain"></i> 解题思维可视化分析
+            </h2>
+            
+            <div class="thinking-process">
+                <!-- 问题分析步骤 -->
+                <div class="step-card active">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <h3 style="color: var(--accent);">
+                            <i class="fas fa-search"></i> 当前步骤分析
+                        </h3>
+                        <span style="background: var(--success); color: white; padding: 4px 12px; border-radius: 20px;">进行中</span>
+                    </div>
+                    <div class="formula-box" style="margin: 15px 0;">
+                        Ω = {(x,y,z) | x²+y²+z² ≤ 4}
+                    </div>
+                    <p style="color: var(--primary);">对称性特征：</p>
+                    <ul style="color: var(--secondary);">
+                        <li>关于x/y/z轴对称</li>
+                        <li>积分函数为偶函数</li>
+                        <li>八分之一对称区域</li>
+                    </ul>
+                </div>
+
+                <!-- 方法推荐步骤 -->
+                <div class="step-card">
+                    <h3 style="color: var(--primary);">
+                        <i class="fas fa-lightbulb"></i> 智能方法推荐
+                    </h3>
+                    <div class="step-progress" style="margin: 15px 0;">
+                        <div class="step-progress-bar" style="width: 70%; background: linear-gradient(90deg, var(--secondary), var(--primary));"></div>
+                    </div>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 15px;">
+                        <div style="padding: 12px; background: rgba(108,155,207,0.1); border-radius: 8px; text-align: center;">
+                            <i class="fas fa-globe" style="color: var(--accent); font-size: 1.5em;"></i>
+                            <p>球坐标系</p>
+                        </div>
+                        <div style="padding: 12px; background: rgba(108,155,207,0.1); border-radius: 8px; text-align: center;">
+                            <i class="fas fa-expand" style="color: var(--success); font-size: 1.5em;"></i>
+                            <p>对称性简化</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 计算过程步骤 -->
+                <div class="step-card">
+                    <h3 style="color: var(--primary);">
+                        <i class="fas fa-calculator"></i> 分步计算演示
+                    </h3>
+                    <div class="formula-box" style="margin: 15px 0;">
+                        = 8∫<sub>0</sub><sup>π/2</sup>∫<sub>0</sub><sup>π/2</sup>∫<sub>0</sub><sup>2</sup> r⁴ sinφ dr dφ dθ
+                    </div>
+                    <div style="display: flex; gap: 10px; margin-top: 15px;">
+                        <button style="background: var(--primary); color: white; border: none; padding: 8px 20px; border-radius: 20px;">
+                            <i class="fas fa-play"></i> 逐步演示
+                        </button>
+                        <button style="background: var(--secondary); color: white; border: none; padding: 8px 20px; border-radius: 20px;">
+                            <i class="fas fa-question"></i> 提示
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 底部导航 -->
+    <div class="nav-container">
+        <div class="nav-items">
+            <div class="nav-item active">
+                <i class="fas fa-home"></i>
+                <span>首页</span>
+            </div>
+            <div class="nav-item">
+                <i class="fas fa-chart-line"></i>
+                <span>分析</span>
+            </div>
+            <div class="nav-item">
+                <i class="fas fa-book-open"></i>
+                <span>题库</span>
+            </div>
+            <div class="nav-item">
+                <i class="fas fa-user"></i>
+                <span>我的</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 交互逻辑
+        document.querySelectorAll('.node, .step-card').forEach(element => {
+            element.addEventListener('click', function() {
+                document.querySelectorAll('.node, .step-card').forEach(el => {
+                    el.classList.remove('active');
+                });
+                this.classList.add('active');
+            });
+        });
+    </script>
+</body>
+</html>
