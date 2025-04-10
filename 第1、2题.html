@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>考研调查数据分析</title>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.0/dist/echarts.min.js"></script>
+    <style>
+        .chart-container {
+            width: 100%;
+            max-width: 1400px;
+            margin: 40px auto;
+            padding: 40px 30px;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        .chart-title {
+            text-align: center;
+            font-family: 'Arial', sans-serif;
+            color: #2c3e50;
+            font-size: 32px;  /* 增大标题字号 */
+            font-weight: 600;  /* 添加加粗效果 */
+            margin-bottom: 10px;  /* 减少下方间距 */
+            letter-spacing: 1.2px;
+        }
+
+        .total-sample {
+            text-align: center;
+            color: #6c757d;
+            font-size: 17px;  /* 微调样本量字号 */
+            margin-bottom: 25px;
+            font-family: 'Arial', sans-serif;
+        }
+    </style>
+</head>
+<body>
+    <div class="chart-container">
+        <div class="chart-title">AI大模型考研数学调查分析</div>
+        <div class="total-sample">有效样本量：497人次</div>
+        <div id="main" style="height:560px;"></div>
+    </div>
+
+    <script>
+        var chartDom = document.getElementById('main');
+        var myChart = echarts.init(chartDom);
+        
+        const ageData = [
+            { value: 394, name: '18-23岁 (79.3%)' },
+            { value: 101, name: '24-30岁 (20.3%)' },
+            { value: 2, name: '30岁以上 (0.4%)' }
+        ];
+
+        const planData = [
+            { value: 238, name: '明确计划 (47.9%)' },
+            { value: 209, name: '犹豫中 (42.1%)' },
+            { value: 50, name: '暂无计划 (10.0%)' }
+        ];
+
+        const option = {
+            tooltip: {
+                trigger: 'item',
+                formatter: '{b}: {c}人 ({d}%)'
+            },
+            grid: [
+                { right: '58%', top: '18%', bottom: '18%' },
+                { left: '58%', top: '18%', bottom: '18%' }
+            ],
+            xAxis: [
+                {
+                    gridIndex: 0,
+                    type: 'value',
+                    show: false,
+                    max: 400
+                },
+                {
+                    gridIndex: 1,
+                    type: 'value',
+                    show: false,
+                    max: 250
+                }
+            ],
+            yAxis: [
+                {
+                    gridIndex: 0,
+                    type: 'category',
+                    inverse: true,
+                    data: ageData.map(item => item.name),
+                    axisLabel: {
+                        color: '#2c3e50',
+                        fontSize: 15,  // 纵坐标文字增大
+                        margin: 15
+                    },
+                    axisLine: { show: false },
+                    axisTick: { show: false }
+                },
+                {
+                    gridIndex: 1,
+                    type: 'category',
+                    inverse: true,
+                    data: planData.map(item => item.name),
+                    axisLabel: {
+                        color: '#2c3e50',
+                        fontSize: 15,  // 纵坐标文字增大
+                        margin: 15
+                    },
+                    axisLine: { show: false },
+                    axisTick: { show: false }
+                }
+            ],
+            series: [
+                {
+                    name: '年龄分布',
+                    type: 'bar',
+                    xAxisIndex: 0,
+                    yAxisIndex: 0,
+                    data: ageData,
+                    itemStyle: {
+                        color: new echarts.graphic.LinearGradient(0, 0, 1, 0, [
+                            { offset: 0, color: '#6a8dff' },
+                            { offset: 1, color: '#3d6ef5' }
+                        ]),
+                        borderRadius: [0, 20, 20, 0]
+                    },
+                    barWidth: 28,
+                    label: {
+                        show: true,
+                        position: 'right',
+                        color: '#3d6ef5',
+                        fontWeight: 'bold',
+                        fontSize: 14
+                    }
+                },
+                {
+                    name: '考研计划',
+                    type: 'bar',
+                    xAxisIndex: 1,
+                    yAxisIndex: 1,
+                    data: planData,
+                    itemStyle: {
+                        color: new echarts.graphic.LinearGradient(0, 0, 1, 0, [
+                            { offset: 0, color: '#4dd4ac' },
+                            { offset: 1, color: '#20c997' }
+                        ]),
+                        borderRadius: [0, 20, 20, 0]
+                    },
+                    barWidth: 28,
+                    label: {
+                        show: true,
+                        position: 'right',
+                        color: '#20c997',
+                        fontWeight: 'bold',
+                        fontSize: 14
+                    }
+                }
+            ],
+            legend: {
+                data: ['年龄分布', '考研计划'],
+                top: 'bottom',
+                textStyle: {
+                    color: '#6c757d',
+                    fontSize: 15  // 图例文字增大
+                },
+                itemGap: 30
+            }
+        };
+
+        myChart.setOption(option);
+        window.addEventListener('resize', function() {
+            myChart.resize();
+        });
+    </script>
+</body>
+</html>
