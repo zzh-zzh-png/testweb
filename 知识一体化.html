@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>知识中枢 - 三重积分对称性应用</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary: #3f72af;
+            --secondary: #6c9bcf;
+            --accent: #ff7f50;
+            --background: #f9f7f7;
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui;
+        }
+
+        body {
+            background: var(--background);
+            margin: 0;
+            padding: 20px 20px 100px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            gap: 30px;
+        }
+
+        /* 知识导航侧边栏 */
+        .sidebar {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+            height: fit-content;
+            position: sticky;
+            top: 20px;
+        }
+
+        .nav-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .nav-item {
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: var(--primary);
+        }
+
+        .nav-item.active {
+            background: #e8f4ff;
+            box-shadow: 0 4px 12px rgba(63,114,175,0.1);
+        }
+
+        /* 主知识区 */
+        .main-area {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+            position: relative;
+            display: grid;
+            gap: 25px;
+        }
+
+        .core-title {
+            color: var(--primary);
+            border-left: 4px solid var(--accent);
+            padding-left: 15px;
+            margin: 0;
+        }
+
+        /* 雷达图容器 */
+        .radar-container {
+            width: 100%;
+            height: 350px;
+            position: relative;
+        }
+
+        /* 扩展内容区 */
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+        }
+
+        .info-card {
+            background: white;
+            border: 2px solid #e0e6f0;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: #ecf0f1;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            width: 68%;
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+        }
+
+        /* 底部导航 */
+        .nav-container {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            padding: 15px 0;
+            box-shadow: 0 -4px 15px rgba(0,0,0,0.08);
+            border-top: 2px solid var(--primary);
+        }
+
+        .nav-items {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-around;
+        }
+
+        .nav-item {
+            text-align: center;
+            color: var(--primary);
+            padding: 10px 20px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .nav-item.active {
+            background: #e8f4ff;
+        }
+
+        .nav-item i {
+            font-size: 1.4em;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+            .sidebar {
+                position: static;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 知识导航 -->
+        <div class="sidebar">
+            <h3><i class="fas fa-sitemap"></i> 知识导航</h3>
+            <ul class="nav-list">
+                <li class="nav-item active">
+                    <i class="fas fa-star"></i>
+                    对称性核心
+                </li>
+                <li class="nav-item">
+                    <i class="fas fa-shapes"></i>
+                    坐标系转换
+                </li>
+                <li class="nav-item">
+                    <i class="fas fa-calculator"></i>
+                    计算实例
+                </li>
+                <li class="nav-item">
+                    <i class="fas fa-chart-pie"></i>
+                    能力分析
+                </li>
+            </ul>
+        </div>
+
+        <!-- 主内容区 -->
+        <div class="main-area">
+            <h2 class="core-title">核心知识点：三重积分对称性应用</h2>
+            
+            <div class="radar-container">
+                <canvas id="knowledgeRadar"></canvas>
+            </div>
+
+            <div class="content-grid">
+                <!-- 知识点详情 -->
+                <div class="info-card">
+                    <h3><i class="fas fa-lightbulb"></i> 知识要点</h3>
+                    <ul>
+                        <li>对称性判定三原则</li>
+                        <li>坐标系选择策略</li>
+                        <li>积分简化四步骤</li>
+                        <li>常见错误分析</li>
+                    </ul>
+                </div>
+
+                <!-- 关联题目 -->
+                <div class="info-card">
+                    <h3><i class="fas fa-list-ol"></i> 关联题目</h3>
+                    <div class="progress-bar">
+                        <div class="progress-fill"></div>
+                    </div>
+                    <p>已完成：17/25题 (68%)</p>
+                    <ul>
+                        <li>球体积分计算</li>
+                        <li>柱坐标变换练习</li>
+                        <li>物理应用综合题</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 修改后的底部导航 -->
+    <div class="nav-container">
+        <div class="nav-items">
+            <div class="nav-item active">
+                <i class="fas fa-home"></i>
+                首页
+            </div>
+            <div class="nav-item">
+                <i class="fas fa-chart-line"></i> <!-- 修改图标 -->
+                分析 <!-- 修改文字 -->
+            </div>
+            <div class="nav-item">
+                <i class="fas fa-database"></i>
+                题库
+            </div>
+            <div class="nav-item">
+                <i class="fas fa-user"></i>
+                我的
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 雷达图配置
+        const ctx = document.getElementById('knowledgeRadar').getContext('2d');
+        new Chart(ctx, {
+            type: 'radar',
+            data: {
+                labels: ['对称性应用', '坐标系转换', '计算速度', '物理建模', '错误识别', '综合应用'],
+                datasets: [{
+                    label: '能力维度',
+                    data: [85, 78, 92, 80, 75, 88],
+                    backgroundColor: 'rgba(63, 114, 175, 0.2)',
+                    borderColor: 'rgba(63, 114, 175, 1)',
+                    pointBackgroundColor: '#fff',
+                    pointBorderColor: '#3f72af'
+                }]
+            },
+            options: {
+                scales: {
+                    r: {
+                        beginAtZero: true,
+                        max: 100,
+                        grid: { color: 'rgba(0,0,0,0.1)' },
+                        pointLabels: { color: '#2c3e50' },
+                        ticks: { display: false }
+                    }
+                },
+                plugins: {
+                    legend: { display: false }
+                },
+                responsive: true,
+                maintainAspectRatio: false
+            }
+        });
+
+        // 导航交互
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', function() {
+                document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+    </script>
+</body>
+</html>
