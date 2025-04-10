@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>智能备考系统 - 用户主界面</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Arial, sans-serif;
+        }
+
+        body {
+            background: #f5f7fb;
+            margin: 0;
+            padding: 20px 20px 80px; /* 为底部导航留出空间 */
+            min-height: 100vh;
+            position: relative;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 25px;
+        }
+
+        /* 核心信息面板 */
+        .main-card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+            border: 1px solid #e0e6f0;
+        }
+
+        .header {
+            border-bottom: 3px solid #3498db; /* 加深分界线 */
+            padding-bottom: 20px;
+            margin-bottom: 25px;
+        }
+
+        .countdown {
+            font-size: 24px;
+            color: #2c3e50;
+            margin: 0;
+            padding-bottom: 10px;
+            border-bottom: 2px dashed #eee;
+        }
+
+        .target {
+            color: #3498db;
+            font-weight: 600;
+            margin-top: 15px;
+        }
+
+        .section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #f0f4ff;
+            border-radius: 10px;
+            background: #f9fbff;
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: #ecf0f1;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            width: 68%;
+            height: 100%;
+            background: linear-gradient(90deg, #3498db, #67b1e6);
+            border-radius: 4px;
+        }
+
+        /* 创新功能扩展 */
+        .innovation-panel {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+            border: 1px solid #e0e6f0;
+        }
+
+        .ai-tag {
+            display: inline-block;
+            padding: 6px 12px;
+            background: #e8f4ff;
+            border-radius: 20px;
+            font-size: 0.9em;
+            margin: 5px;
+            border: 1px solid #cce0f5;
+        }
+
+        .visual3d-link {
+            color: #3498db;
+            text-decoration: none;
+            border-bottom: 1px dashed;
+            font-weight: 500;
+        }
+
+        /* 底部导航 */
+        .nav-container {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            padding: 15px 0;
+            box-shadow: 0 -4px 15px rgba(0,0,0,0.08);
+            border-top: 2px solid #3498db;
+        }
+
+        .nav-items {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-around;
+        }
+
+        .nav-item {
+            text-align: center;
+            color: #2c3e50;
+            padding: 10px 20px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .nav-item:hover {
+            background: #e8f4ff;
+            transform: translateY(-2px);
+        }
+
+        .nav-item i {
+            font-size: 1.2em;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+            
+            .nav-items {
+                justify-content: space-between;
+                padding: 0 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 主信息区 -->
+        <div class="main-card">
+            <div class="header">
+                <h1 class="countdown">📅 距离考研还有 228天！</h1>
+                <p class="target">🎯 目标：西南大学统计学（数三）</p>
+            </div>
+
+            <!-- 当前攻关 -->
+            <div class="section">
+                <h3>📌 当前核心攻关</h3>
+                <p>三重积分对称性应用 <span class="ai-tag">AI推荐重点</span></p>
+                <div class="progress-bar">
+                    <div class="progress-fill"></div>
+                </div>
+                <p>知识点掌握度：68%</p>
+            </div>
+
+            <!-- 阶段规划 -->
+            <div class="section">
+                <h3>📆 阶段规划</h3>
+                <p>基础阶段：4月-6月 <span class="ai-tag">智能排课中</span></p>
+                <p>强化阶段：7月-9月</p>
+            </div>
+
+            <!-- 智能诊断 -->
+            <div class="section">
+                <h3>⚙️ 智能适配系统</h3>
+                <p>当前难度系数：<strong>0.65</strong></p>
+                <p>推荐区间：0.6-0.7</p>
+                <a href="#" class="visual3d-link">查看三维能力图谱 →</a>
+            </div>
+        </div>
+
+        <!-- 创新功能侧边栏 -->
+        <div class="innovation-panel">
+            <h3 style="border-bottom: 2px solid #3498db; padding-bottom: 15px;">🌟 创新功能</h3>
+            <div class="section">
+                <h4>🧬 考纲DNA匹配度</h4>
+                <p>当前章节与西南大学考纲契合度：92%</p>
+                <a href="#" class="ai-tag">查看命题特征库</a>
+            </div>
+
+            <div class="section">
+                <h4>🤖 智能诊断报告</h4>
+                <p>昨日练习薄弱点：<br>
+                <span class="ai-tag">多元微分计算</span>
+                <span class="ai-tag">矩阵相似判定</span>
+                </p>
+                <button style="background:linear-gradient(135deg, #3498db, #67b1e6);color:white;border:none;padding:10px 25px;border-radius:8px;cursor:pointer">
+                    生成改进方案
+                </button>
+            </div>
+
+            <div class="section">
+                <h4>🧘 心理状态监测</h4>
+                <p>今日推荐调节方案：</p>
+                <p>✅ 呼吸练习 <br>
+                ✅ 轻音乐包</p>
+                <p class="ai-tag">压力检测：当前压力指数 0.58</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 底部导航 -->
+    <div class="nav-container">
+        <div class="nav-items">
+            <div class="nav-item">
+                <i class="fas fa-home"></i>
+                首页
+            </div>
+            <div class="nav-item">
+                <i class="fas fa-chart-line"></i>
+                分析
+            </div>
+            <div class="nav-item">
+                <i class="fas fa-book-open"></i>
+                题库
+            </div>
+            <div class="nav-item">
+                <i class="fas fa-user"></i>
+                我的
+            </div>
+        </div>
+    </div>
+
+    <!-- Font Awesome 图标库 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</body>
+</html>
