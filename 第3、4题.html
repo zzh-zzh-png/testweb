@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>考研数学双维度分析看板</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.4.0/echarts.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            background: #f5f7fa;
+        }
+        .dashboard {
+            max-width: 1600px;
+            margin: 0 auto;
+            background: #fff;
+            border-radius: 20px;
+            box-shadow: 0 12px 40px rgba(0,0,0,0.08);
+            padding: 40px;
+        }
+        .main-title {
+            text-align: center;
+            font: bold 28px/1.4 'Microsoft Yahei';
+            color: #2c3e50;
+            margin-bottom: 40px;
+        }
+        .chart-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+        }
+        .chart-container {
+            height: 600px;
+            position: relative;
+        }
+        @media (max-width: 1200px) {
+            .chart-group { grid-template-columns: 1fr; }
+            .dashboard { padding: 30px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard">
+        <h2 class="main-title">考研数学备考痛点与资源需求关联分析<br>
+            <span style="font-size:18px;color:#666;margin-top:10px;">有效样本量：497人</span>
+        </h2>
+        
+        <div class="chart-group">
+            <!-- 挑战分析 -->
+            <div class="chart-container" id="chart3"></div>
+            
+            <!-- 资源分析 -->
+            <div class="chart-container" id="chart4"></div>
+        </div>
+    </div>
+
+<script>
+// 数据处理函数
+function processData(originalData, total) {
+    return originalData
+        .map(item => ({
+            ...item,
+            percent: (item.value / total * 100).toFixed(1) + '%'
+        }))
+        .sort((a, b) => b.value - a.value);
+}
+
+// 问题3数据（总人数497）
+const challengeData = processData([
+    {value:358, name:'B.题目难度大'},
+    {value:343, name:'A.知识点繁多'},
+    {value:299, name:'C.方法技巧缺乏'},
+    {value:252, name:'D.知识遗忘率高'},
+    {value:196, name:'E.时间管理困难'}
+], 497);
+
+// 问题4数据（总人数497）
+const resourceData = processData([
+    {value:325, name:'C.个性定制'},
+    {value:279, name:'D.深度解析'},
+    {value:271, name:'A.优质题库'},
+    {value:257, name:'B.名师指导'},
+    {value:221, name:'E.进度追踪'}
+], 497);
+
+// 挑战玫瑰图优化版
+let chart3 = echarts.init(document.getElementById('chart3'));
+let option3 = {
+    title: {
+        text: '学习挑战分布（按严重程度排序）',
+        left: 'center',
+        textStyle: { color: '#333', fontSize: 16 }
+    },
+    tooltip: {
+        trigger: 'item',
+        formatter: ({name, value, percent}) => 
+            `${name}<br>人数：${value}人<br>占比：${percent}`
+    },
+    legend: { 
+        orient: 'vertical',
+        right: 30,
+        top: 80,
+        itemGap: 20,
+        textStyle: { 
+            color: '#666',
+            fontSize: 14,
+            lineHeight: 24
+        },
+        padding: [0, 0, 0, 30]
+    },
+    series: [{
+        type: 'pie',
+        radius: ['15%', '65%'],
+        center: ['40%', '50%'],
+        roseType: 'radius',
+        data: challengeData,
+        label: {
+            formatter: '{b|{b}}\n{hr|}\n{c|{c}人}',
+            rich: {
+                b: { fontSize: 14, color: '#333', lineHeight: 26 },
+                hr: { borderColor: '#ddd', width: '100%', height: 0 },
+                c: { fontSize: 14, color: '#45b7d1' }
+            },
+            position: 'outside',
+            alignTo: 'none',
+            bleedMargin: 10
+        },
+        color: [
+            '#ff6b6b','#4ecdc4','#45b7d1','#96c93d','#ffa502'
+        ]
+    }],
+    grid: {
+        right: '25%'
+    }
+};
+
+// 资源组合图优化版
+let chart4 = echarts.init(document.getElementById('chart4'));
+let option4 = {
+    title: {
+        text: '资源需求分析（按百分比排序）',
+        left: 'center',
+        textStyle: { color: '#333', fontSize: 16 }
+    },
+    tooltip: {
+        trigger: 'axis',
+        axisPointer: { type: 'shadow' }
+    },
+    xAxis: {
+        type: 'category',
+        data: resourceData.map(d => {
+            const parts = d.name.split('.');
+            return parts[1].replace(/(.{4})/g, "$1\n");
+        }),
+        axisLabel: { 
+            fontSize: 14,
+            interval: 0,
+            formatter: function(value) {
+                return value.replace(/\n/g, '');
+            },
+            width: 80,
+            overflow: 'break',
+            lineHeight: 18
+        },
+        axisTick: { show: false }
+    },
+    yAxis: [{
+        type: 'value',
+        name: '人数',
+        axisLabel: { color: '#4ecdc4' }
+    }, {
+        type: 'value',
+        name: '百分比',
+        axisLabel: { 
+            color: '#45b7d1',
+            formatter: '{value}%' 
+        }
+    }],
+    series: [
+    {
+        type: 'bar',
+        name: '选择人数',
+        data: resourceData.map(d => d.value),
+        itemStyle: {
+            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                { offset: 0, color: '#4ecdc4' },
+                { offset: 1, color: '#45b7d1' }
+            ]),
+            borderRadius: [6, 6, 0, 0]
+        }
+    },
+    {
+        type: 'line',
+        name: '占比',
+        yAxisIndex: 1,
+        symbolSize: 10,
+        data: resourceData.map(d => parseFloat(d.percent)),
+        lineStyle: { color: '#45b7d1', width: 3 },
+        itemStyle: { 
+            color: '#fff', 
+            borderWidth: 2, 
+            borderColor: '#45b7d1' 
+        },
+        label: {
+            show: true,
+            position: 'top',
+            formatter: '{c}%',
+            color: '#45b7d1',
+            fontSize: 14,
+            fontWeight: 'bold'
+        }
+    }]
+};
+
+chart3.setOption(option3);
+chart4.setOption(option4);
+
+// 响应式
+window.addEventListener('resize', () => {
+    chart3.resize();
+    chart4.resize();
+});
+</script>
+</body>
+</html>

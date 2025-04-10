@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AI大模型认知与使用关联分析</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #3498db;
+            --accent: #e74c3c;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background: #f8f9fa;
+            font-family: 'Helvetica Neue', sans-serif;
+        }
+
+        .dashboard {
+            background: white;
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+            width: 1000px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 3fr 2fr;
+            gap: 30px;
+            margin-top: 30px;
+        }
+
+        .flow-chart {
+            position: relative;
+            padding: 20px;
+            border-left: 3px solid var(--secondary);
+        }
+
+        .flow-step {
+            margin: 25px 0;
+            padding: 15px;
+            background: rgba(52,152,219,0.05);
+            border-radius: 8px;
+            transition: transform 0.3s;
+        }
+
+        .flow-step:hover {
+            transform: translateX(10px);
+        }
+
+        .metric {
+            color: var(--primary);
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .metric-label {
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+
+        .association-chart {
+            padding: 20px;
+            border-right: 3px solid var(--accent);
+        }
+
+        canvas {
+            background: white;
+            border-radius: 12px;
+            padding: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard">
+        <h2 style="color:var(--primary);text-align:center;margin-bottom:20px;">AI大模型认知与使用关联分析</h2>
+        <div class="grid">
+            <!-- 左：数据流分析 -->
+            <div class="flow-chart">
+                <div class="flow-step">
+                    <div class="metric">497</div>
+                    <div class="metric-label">总样本量</div>
+                </div>
+                
+                <div class="flow-step">
+                    <div class="metric">341 <span style="color:var(--secondary);font-size:16px;">(基本了解)</span></div>
+                    <div class="metric-label">认知群体主体</div>
+                </div>
+
+                <div class="flow-step">
+                    <div class="metric">374 <span style="color:var(--accent);font-size:16px;">(75.25%)</span></div>
+                    <div class="metric-label">实际使用群体</div>
+                </div>
+
+                <canvas id="associationChart"></canvas>
+            </div>
+
+            <!-- 右：认知使用矩阵 -->
+            <div class="association-chart">
+                <h3 style="color:var(--primary);margin-top:0;">认知-使用关系矩阵</h3>
+                <canvas id="matrixChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+<script>
+    // 关联分析散点图
+    new Chart(document.getElementById('associationChart'), {
+        type: 'scatter',
+        data: {
+            datasets: [{
+                label: '认知 vs 使用',
+                data: [
+                    {x: 5, y: 90},  // 非常熟悉
+                    {x: 4, y: 75},  // 基本了解
+                    {x: 2, y: 30},  // 仅听说
+                    {x: 1, y: 5}    // 不了解
+                ],
+                backgroundColor: [
+                    'rgba(52,152,219,0.8)',
+                    'rgba(46,204,113,0.8)',
+                    'rgba(241,196,15,0.8)',
+                    'rgba(231,76,60,0.8)'
+                ],
+                pointRadius: 12,
+                pointHoverRadius: 16
+            }]
+        },
+        options: {
+            scales: {
+                x: {
+                    title: {display: true, text: '认知程度'},
+                    min: 0,
+                    max: 6,
+                    ticks: {
+                        callback: function(value) {
+                            const labels = ['','不了解','仅听说','','基本了解','','非常熟悉'];
+                            return labels[value];
+                        }
+                    }
+                },
+                y: {
+                    title: {display: true, text: '使用倾向 (%)'},
+                    min: 0,
+                    max: 100
+                }
+            },
+            plugins: {
+                tooltip: {
+                    callbacks: {
+                        title: () => '',
+                        label: ctx => {
+                            const labels = ['非常熟悉','基本了解','仅听说','不了解'];
+                            return `${labels[ctx.dataIndex]}群体\n使用倾向: ${ctx.parsed.y}%`;
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+    // 矩阵饼图
+    new Chart(document.getElementById('matrixChart'), {
+        type: 'pie',
+        data: {
+            labels: ['使用且了解 (374)', '未使用但了解 (0)', '使用但不了解 (0)', '都不了解 (123)'],
+            datasets: [{
+                data: [374, 0, 0, 123],
+                backgroundColor: [
+                    'rgba(52,152,219,0.8)',
+                    'rgba(46,204,113,0.3)',
+                    'rgba(241,196,15,0.3)',
+                    'rgba(231,76,60,0.3)'
+                ],
+                borderWidth: 0
+            }]
+        },
+        options: {
+            plugins: {
+                legend: { position: 'bottom' },
+                tooltip: { enabled: false }
+            }
+        }
+    });
+</script>
+</body>
+</html>

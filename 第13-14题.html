@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AI备考使用趋势双维透视</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+    <style>
+        body {
+            background: #f8fafc;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            font-family: 'Inter', system-ui, sans-serif;
+        }
+
+        .dashboard {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 12px 24px rgba(15, 23, 42, 0.08);
+            padding: 40px;
+            width: 1000px;
+        }
+
+        .main-title {
+            text-align: center;
+            color: #1e3a8a;
+            margin-bottom: 20px;
+            font-weight: 700;
+        }
+
+        .main-title .text-main {
+            font-size: 1.4em;
+            display: block;
+        }
+
+        .sample-count {
+            font-size: 0.6em;
+            color: #64748b;
+            margin-top: 8px;
+            font-weight: 400;
+        }
+
+        .chart-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-top: 20px;
+        }
+
+        .chart-card {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(15, 23, 42, 0.06);
+        }
+
+        .chart-title {
+            text-align: center;
+            margin: 0 0 18px;
+            font-size: 1.2em;
+            font-weight: 600;
+            color: #1e293b;
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard">
+        <h1 class="main-title">
+            <span class="text-main">AI备考趋势双维透视</span>
+            <div class="sample-count">有效样本总数：497人</div>
+        </h1>
+        
+        <div class="chart-container">
+            <div class="chart-card">
+                <h2 class="chart-title">使用强度分布（单位：人）</h2>
+                <canvas id="usageChart"></canvas>
+            </div>
+            
+            <div class="chart-card">
+                <h2 class="chart-title">付费意愿分布（单位：人）</h2>
+                <canvas id="paymentChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        Chart.register(ChartDataLabels);
+
+        const colors = {
+            purple: ['#6366f1', '#818cf8', '#a5b4fc', '#c7d2fe'],
+            blue: '#3b82f6'
+        };
+
+        // 左图保持不变
+        new Chart(document.getElementById('usageChart'), {
+            type: 'doughnut',
+            data: {
+                labels: ['轻度使用 (0-5h)', '中度使用 (6-10h)', '重度使用 (11-15h)', '超重度使用 (16-20h)'],
+                datasets: [{
+                    data: [225, 203, 47, 22],
+                    backgroundColor: colors.purple,
+                    borderWidth: 0,
+                    hoverOffset: 8
+                }]
+            },
+            options: {
+                cutout: '68%',
+                plugins: {
+                    legend: { 
+                        position: 'right',
+                        labels: {
+                            boxWidth: 14,
+                            padding: 14,
+                            font: { size: 12 },
+                            usePointStyle: true
+                        }
+                    },
+                    datalabels: {
+                        color: 'white',
+                        font: { weight: 'bold', size: 12 },
+                        formatter: (value, context) => {
+                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                            return `${value}\n(${(value/total*100).toFixed(1)}%)`;
+                        }
+                    }
+                }
+            }
+        });
+
+        // 右图修改部分
+        new Chart(document.getElementById('paymentChart'), {
+            type: 'bar',
+            data: {
+                labels: ['基础版 (0-50元)', '标准版 (51-100元)', '进阶版 (101-150元)', '专业版 (151-200元)', '旗舰版 (200+元)'],
+                datasets: [{
+                    data: [273, 152, 57, 9, 6],
+                    backgroundColor: colors.blue,
+                    borderRadius: 6,
+                    categoryPercentage: 0.8
+                }]
+            },
+            options: {
+                indexAxis: 'y',
+                plugins: {
+                    legend: { display: false },
+                    datalabels: {
+                        anchor: 'end',
+                        align: 'right',
+                        color: '#1e3a8a',
+                        font: {
+                            weight: 'bold',
+                            size: 12
+                        },
+                        // 仅显示数值
+                        formatter: (value) => `${value}人`
+                    }
+                },
+                scales: {
+                    x: { 
+                        display: false,
+                        grid: { display: false },
+                        max: 300
+                    },
+                    y: { 
+                        grid: { display: false },
+                        ticks: { 
+                            font: { 
+                                size: 12.5,
+                                weight: 500 
+                            },
+                            color: '#475569'
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

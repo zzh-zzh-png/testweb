@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AI大模型考研数学需求分析</title>
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <style>
+        body {
+            background: #f8fafc;
+            font-family: 'Helvetica Neue', sans-serif;
+            margin: 0;
+        }
+        .dashboard-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 30px;
+            background: white;
+            box-shadow: 0 0 30px rgba(0,0,0,0.1);
+        }
+        .main-title {
+            text-align: center;
+            color: #2c3e50;
+            font-size: 28px;
+            margin-bottom: 35px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid #3498db;
+            letter-spacing: 1.2px;
+        }
+        .chart-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 30px;
+            margin-top: 20px;
+        }
+        .chart-card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 25px;
+            border: 1px solid #e4e7ed;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+        .chart-title {
+            font-size: 20px;
+            color: #2c3e50;
+            margin-bottom: 25px;
+            font-weight: 600;
+            padding-left: 10px;
+            border-left: 5px solid #3498db;
+        }
+        .q-mark {
+            color: #e74c3c;
+            margin-right: 10px;
+            font-size: 22px;
+        }
+        .dual-chart {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            height: 420px;
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <h1 class="main-title">AI大模型考研数学应用需求全景分析</h1>
+        
+        <div class="chart-grid">
+            <!-- Q7+8 组合图 -->
+            <div class="chart-card">
+                <div class="chart-title">
+                    <span class="q-mark">Q7+8</span>功能需求与改进方向
+                </div>
+                <div id="comboChart" style="height: 400px;"></div>
+            </div>
+
+            <!-- Q9 雷达图 -->
+            <div class="chart-card">
+                <div class="chart-title">
+                    <span class="q-mark">Q9</span>系统特性关注度
+                </div>
+                <div id="radarChart" style="height: 400px;"></div>
+            </div>
+
+            <!-- Q10 横向柱状图 -->
+            <div class="chart-card">
+                <div class="chart-title">
+                    <span class="q-mark">Q10</span>备考方案核心需求
+                </div>
+                <div id="horizontalBar" style="height: 380px;"></div>
+            </div>
+
+            <!-- Q11+12 合并展示 -->
+            <div class="chart-card">
+                <div class="chart-title">
+                    <span class="q-mark">Q11+12</span>使用意愿与顾虑分析
+                </div>
+                <div class="dual-chart">
+                    <div id="donutChart" style="height: 360px;"></div>
+                    <div id="progressBars"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<script>
+// 通用字体配置
+const baseFontSize = '15px';
+const labelFontSize = '14px';
+
+// Q7+8 组合图
+const comboOptions = {
+    series: [{
+        name: '功能需求',
+        type: 'bar',
+        data: [287,331,322,279,260,4]
+    }, {
+        name: '改进需求',
+        type: 'line',
+        data: [294,363,301,228]
+    }],
+    chart: { height: 400, type: 'line', fontFamily: 'Helvetica Neue' },
+    colors: ['#3498db', '#2ecc71'],
+    xaxis: {
+        categories: ['题库推荐','知识图谱','错题诊断','学习路径','解题拆解','其他'],
+        labels: { style: { fontSize: labelFontSize } }
+    },
+    yaxis: { labels: { style: { fontSize: labelFontSize } } },
+    plotOptions: { 
+        bar: { 
+            borderRadius: 8,
+            dataLabels: { 
+                position: 'top',
+                style: { fontSize: '13px' }
+            }
+        }
+    },
+    legend: { fontSize: baseFontSize }
+};
+
+// Q9 雷达图
+const radarOptions = {
+    series: [{ data: [288,345,330,276] }],
+    chart: { height: 400, type: 'radar', fontFamily: 'Helvetica Neue' },
+    labels: ['知识关联','进度匹配','解题可视化','考频预测'],
+    colors: ['#e67e22'],
+    fill: { opacity: 0.2 },
+    markers: { size: 6 },
+    xaxis: { labels: { style: { fontSize: labelFontSize } } },
+    yaxis: { labels: { style: { fontSize: labelFontSize } } }
+};
+
+// Q10 横向柱状图
+const horizontalOptions = {
+    series: [{ 
+        name: '关注度',
+        data: [310,358,280,148]
+    }],
+    chart: { 
+        type: 'bar', 
+        height: 380,
+        toolbar: { show: false },
+        fontFamily: 'Helvetica Neue'
+    },
+    colors: ['#9b59b6'],
+    plotOptions: {
+        bar: {
+            horizontal: true,
+            borderRadius: 8,
+            dataLabels: {
+                position: 'middle',
+                formatter: (val) => `${val}人`,
+                style: { fontSize: '14px' }
+            }
+        }
+    },
+    dataLabels: {
+        enabled: true,
+        style: {
+            colors: ['#2c3e50'],
+            fontSize: '14px'
+        }
+    },
+    xaxis: {
+        categories: ['考纲匹配度','能力可视化','风险预警','调整机制'],
+        labels: { style: { fontSize: labelFontSize } }
+    },
+    yaxis: { labels: { style: { fontSize: labelFontSize } } }
+};
+
+// Q11 环形图
+const donutOptions = {
+    series: [243,241,13],
+    chart: { 
+        type: 'donut', 
+        height: 360,
+        fontFamily: 'Helvetica Neue'
+    },
+    labels: ['非常愿意','观望态度','信任传统'],
+    colors: ['#3498db', '#2ecc71', '#e74c3c'],
+    plotOptions: {
+        donut: {
+            size: '65%',
+            labels: {
+                show: true,
+                name: { fontSize: '15px' },
+                value: { fontSize: '16px' },
+                total: {
+                    show: true,
+                    label: '总人数',
+                    color: '#2c3e50',
+                    fontSize: '16px'
+                }
+            }
+        }
+    }
+};
+
+// Q12 进度条
+const concerns = [
+    {label: '解题准确性', value: 327, color: '#e74c3c'},
+    {label: '隐私安全', value: 301, color: '#3498db'},
+    {label: '技术成熟度', value: 266, color: '#2ecc71'},
+    {label: '费用成本', value: 199, color: '#e67e22'},
+    {label: '过度依赖', value: 184, color: '#9b59b6'}
+];
+
+const progressHTML = concerns.map(item => `
+    <div style="margin: 18px 0;">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+            <span style="color: #2c3e50; font-size: 15px; font-weight: 500;">${item.label}</span>
+            <span style="color: #7f8c8d; font-size: 15px;">${item.value}人</span>
+        </div>
+        <div style="height: 12px; background: #f0f2f5; border-radius: 6px; overflow: hidden;">
+            <div style="width: ${(item.value/497*100).toFixed(1)}%;
+                height: 100%;
+                background: ${item.color};
+                transition: width 0.8s ease;
+                position: relative;">
+                <div style="position: absolute; right: 0; 
+                    background: linear-gradient(90deg, 
+                    rgba(255,255,255,0.3) 0%, 
+                    rgba(255,255,255,0.15) 100%);
+                    width: 25px;
+                    height: 100%;"></div>
+            </div>
+        </div>
+    </div>
+`).join('');
+
+// 渲染图表
+document.getElementById('progressBars').innerHTML = progressHTML;
+new ApexCharts(document.querySelector("#comboChart"), comboOptions).render();
+new ApexCharts(document.querySelector("#radarChart"), radarOptions).render();
+new ApexCharts(document.querySelector("#horizontalBar"), horizontalOptions).render();
+new ApexCharts(document.querySelector("#donutChart"), donutOptions).render();
+</script>
+</body>
+</html>
