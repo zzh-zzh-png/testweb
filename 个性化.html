@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>个性化学习宇宙</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary: #3f72af;
+            --secondary: #6c9bcf;
+            --accent: #ff7f50;
+            --success: #4CAF50;
+            --background: #f9f7f7;
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: var(--background);
+            padding: 20px 20px 100px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* 个人概览 */
+        .profile-header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+        }
+
+        /* 学习路径 */
+        .learning-path {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .phase-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            border-left: 4px solid var(--primary);
+        }
+
+        .phase-progress {
+            height: 6px;
+            background: rgba(63,114,175,0.1);
+            margin: 15px 0;
+            border-radius: 3px;
+        }
+
+        .phase-progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            border-radius: 3px;
+        }
+
+        /* 数据看板 */
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 15px;
+            margin: 25px 0;
+        }
+
+        .compact-chart {
+            height: 180px !important;
+            margin: 15px 0;
+        }
+
+        /* 个性化设置 */
+        .settings-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            margin-top: 25px;
+        }
+
+        .switch-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 15px 0;
+        }
+
+        .switch {
+            position: relative;
+            width: 48px;
+            height: 24px;
+        }
+
+        .switch input { 
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: #ccc;
+            transition: .4s;
+            border-radius: 24px;
+        }
+
+        .slider:before {
+            content: "";
+            position: absolute;
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background: var(--primary);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(24px);
+        }
+
+        /* 底部导航 */
+        .nav-container {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            padding: 15px 0;
+            box-shadow: 0 -4px 15px rgba(0,0,0,0.08);
+            border-top: 2px solid var(--primary);
+        }
+
+        .nav-items {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-around;
+        }
+
+        .nav-item {
+            color: var(--primary);
+            padding: 10px 25px;
+            border-radius: 30px;
+            transition: 0.3s;
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .nav-item.active {
+            background: rgba(63,114,175,0.1);
+        }
+
+        @media (max-width: 768px) {
+            .learning-path, .dashboard {
+                grid-template-columns: 1fr;
+            }
+            .nav-item span {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 个人概览 -->
+        <div class="profile-header">
+            <h2>👩🎓 王同学的学习宇宙</h2>
+            <p style="margin: 15px 0;">📅 已持续学习 86 天 | 🏆 完成 12 个知识模块</p>
+            <div class="phase-progress">
+                <div class="phase-progress-bar" style="width: 65%"></div>
+            </div>
+            <div style="display: flex; gap: 15px; margin-top: 20px; flex-wrap: wrap;">
+                <div style="padding: 10px 20px; background: rgba(255,255,255,0.2); border-radius: 20px;">
+                    <i class="fas fa-bullseye"></i> 当前目标：三重积分应用
+                </div>
+                <div style="padding: 10px 20px; background: rgba(255,255,255,0.2); border-radius: 20px;">
+                    <i class="fas fa-clock"></i> 日均学习：7.3小时
+                </div>
+            </div>
+        </div>
+
+        <!-- 学习路径 -->
+        <div class="learning-path">
+            <div class="phase-card">
+                <h3><i class="fas fa-stethoscope"></i> 诊断阶段</h3>
+                <div class="phase-progress">
+                    <div class="phase-progress-bar" style="width: 100%"></div>
+                </div>
+                <p style="color: var(--secondary); margin: 10px 0;">
+                    <i class="fas fa-check-circle"></i> 已完成基础能力诊断
+                </p>
+            </div>
+
+            <div class="phase-card" style="border-color: var(--accent);">
+                <h3><i class="fas fa-graduation-cap"></i> 学习阶段</h3>
+                <div class="phase-progress">
+                    <div class="phase-progress-bar" style="width: 45%"></div>
+                </div>
+                <div style="margin: 15px 0;">
+                    <button style="background: var(--accent); color: white; padding: 8px 25px; 
+                            border: none; border-radius: 20px; width: 100%;">
+                        <i class="fas fa-play"></i> 继续当前学习
+                    </button>
+                </div>
+            </div>
+
+            <div class="phase-card">
+                <h3><i class="fas fa-dumbbell"></i> 强化阶段</h3>
+                <p style="color: var(--primary); margin: 10px 0;">
+                    <i class="fas fa-lock"></i> 将于4月15日解锁
+                </p>
+            </div>
+        </div>
+
+        <!-- 数据看板 -->
+        <div class="dashboard">
+            <div class="phase-card">
+                <h4><i class="fas fa-brain"></i> 知识掌握度</h4>
+                <canvas id="knowledgeChart" class="compact-chart"></canvas>
+            </div>
+            <div class="phase-card">
+                <h4><i class="fas fa-running"></i> 学习活跃度</h4>
+                <canvas id="activityChart" class="compact-chart"></canvas>
+            </div>
+        </div>
+
+        <!-- 个性化设置 -->
+        <div class="settings-card">
+            <h3 style="color: var(--primary); margin-bottom: 20px;">
+                <i class="fas fa-cog"></i> 个性化设置
+            </h3>
+
+            <div class="switch-container">
+                <span>深色模式</span>
+                <label class="switch">
+                    <input type="checkbox">
+                    <span class="slider"></span>
+                </label>
+            </div>
+
+            <div class="switch-container">
+                <span>学习提醒</span>
+                <label class="switch">
+                    <input type="checkbox" checked>
+                    <span class="slider"></span>
+                </label>
+            </div>
+
+            <div class="switch-container">
+                <span>AI学习伙伴</span>
+                <label class="switch">
+                    <input type="checkbox" checked>
+                    <span class="slider"></span>
+                </label>
+            </div>
+
+            <div style="margin: 20px 0;">
+                <label>每日目标时长</label>
+                <input type="range" min="1" max="4" value="7" 
+                    style="width: 100%; margin: 10px 0;"
+                    oninput="document.getElementById('targetValue').innerText = this.value">
+                <div style="text-align: center; color: var(--accent);">
+                    <span id="targetValue">7</span> 小时
+                </div>
+            </div>
+
+            <div style="margin: 15px 0;">
+                <label>重点突破领域</label>
+                <select style="width: 100%; padding: 10px; margin: 10px 0; 
+                        border: 1px solid var(--secondary); border-radius: 8px;">
+                    <option>积分计算</option>
+                    <option selected>对称性应用</option>
+                    <option>物理建模</option>
+                </select>
+            </div>
+
+            <button style="background: var(--primary); color: white; padding: 12px; 
+                    border: none; border-radius: 8px; width: 100%;">
+                <i class="fas fa-save"></i> 保存个性化设置
+            </button>
+        </div>
+    </div>
+
+    <!-- 底部导航 -->
+    <div class="nav-container">
+        <div class="nav-items">
+            <div class="nav-item active">
+                <i class="fas fa-home"></i>
+                <span>首页</span>
+            </div>
+            <div class="nav-item">
+                <i class="fas fa-chart-line"></i>
+                <span>分析</span>
+            </div>
+            <div class="nav-item">
+                <i class="fas fa-book-open"></i>
+                <span>题库</span>
+            </div>
+            <div class="nav-item">
+                <i class="fas fa-user"></i>
+                <span>我的</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 知识掌握度雷达图
+        new Chart(document.getElementById('knowledgeChart'), {
+            type: 'radar',
+            data: {
+                labels: ['基础运算', '空间想象', '公式应用', '建模能力', '解题速度'],
+                datasets: [{
+                    data: [85, 72, 88, 65, 79],
+                    backgroundColor: 'rgba(63,114,175,0.2)',
+                    borderColor: 'rgba(63,114,175,1)',
+                    pointBackgroundColor: '#fff'
+                }]
+            },
+            options: {
+                maintainAspectRatio: false,
+                scales: {
+                    r: {
+                        beginAtZero: true,
+                        max: 100,
+                        ticks: { display: false },
+                        grid: { color: 'rgba(0,0,0,0.1)' }
+                    }
+                },
+                plugins: {
+                    legend: { display: false }
+                }
+            }
+        });
+
+        // 学习活跃度折线图
+        new Chart(document.getElementById('activityChart'), {
+            type: 'line',
+            data: {
+                labels: ['第1周','第2周','第3周','第4周'],
+                datasets: [{
+                    data: [8, 12, 9, 15],
+                    borderColor: 'rgba(255,127,80,1)',
+                    tension: 0.4,
+                    fill: false
+                }]
+            },
+            options: {
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: { stepSize: 5 }
+                    }
+                }
+            }
+        });
+
+        // 导航交互
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', function() {
+                document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+    </script>
+</body>
+</html>
