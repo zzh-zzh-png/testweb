@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>智能焦虑调节舱系统</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6C5CE7;
+            --secondary: #00B894;
+            --accent: #FF7675;
+            --background: #F8F9FF;
+            --card-bg: #FFFFFF;
+            --gradient: linear-gradient(135deg, #6C5CE7 0%, #00B894 100%);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        body {
+            background: var(--background);
+            min-height: 100vh;
+        }
+
+        .header {
+            background: var(--gradient);
+            padding: 1.5rem 2rem;
+            color: white;
+            box-shadow: 0 4px 20px rgba(108,92,231,0.2);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        .interface-container {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+            min-height: 60vh;
+            position: relative;
+            display: none;
+        }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            padding: 2rem;
+        }
+
+        .function-card {
+            background: var(--background);
+            border-radius: 16px;
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .function-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(108,92,231,0.1);
+        }
+
+        .pressure-canvas {
+            border: 2px solid var(--primary);
+            border-radius: 12px;
+            touch-action: none;
+            background: white;
+            width: 100%;
+            height: 400px;
+        }
+
+        .music-card {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            background: var(--background);
+            border-radius: 12px;
+            margin: 1rem 0;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .breath-animation {
+            width: 200px;
+            height: 200px;
+            margin: 2rem auto;
+            position: relative;
+        }
+
+        .nav-button {
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: absolute;
+            bottom: 2rem;
+            right: 2rem;
+        }
+
+        .primary-btn { background: var(--primary); color: white; }
+        .secondary-btn { background: var(--secondary); color: white; }
+
+        @keyframes pulse {
+            0% { transform: scale(0.8); opacity: 0.5; }
+            50% { transform: scale(1.2); opacity: 1; }
+            100% { transform: scale(0.8); opacity: 0.5; }
+        }
+
+        #main-interface { display: block; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>智能焦虑调节舱系统</h1>
+        <div id="stress-level">压力等级：-</div>
+    </div>
+
+    <div class="container">
+        <!-- 主界面 -->
+        <div class="interface-container" id="main-interface">
+            <div class="grid-container">
+                <div class="function-card" onclick="showInterface('detection')">
+                    <i class="fas fa-drafting-compass fa-3x" style="color: var(--primary);"></i>
+                    <h3>压力检测</h3>
+                    <p>通过手写分析实时压力水平</p>
+                </div>
+                
+                <div class="function-card" onclick="showContent('music')">
+                    <i class="fas fa-music fa-3x" style="color: var(--secondary);"></i>
+                    <h3>音乐疗法</h3>
+                    <p>选择放松音乐调节情绪</p>
+                </div>
+
+                <div class="function-card" onclick="showContent('breath')">
+                    <i class="fas fa-spa fa-3x" style="color: var(--accent);"></i>
+                    <h3>呼吸训练</h3>
+                    <p>4-7-8呼吸法指导练习</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 压力检测界面 -->
+        <div class="interface-container" id="detection-interface">
+            <h2>请在下方区域书写或绘画</h2>
+            <canvas class="pressure-canvas"></canvas>
+            <button class="nav-button primary-btn" onclick="analyzePressure()">
+                <i class="fas fa-chart-bar"></i> 立即分析
+            </button>
+            <button class="nav-button secondary-btn" onclick="showInterface('main')" 
+                    style="right: 160px;">
+                <i class="fas fa-arrow-left"></i> 返回
+            </button>
+        </div>
+
+        <!-- 动态内容界面 -->
+        <div class="interface-container" id="content-interface">
+            <div id="dynamic-content"></div>
+            <button class="nav-button secondary-btn" onclick="showInterface('main')">
+                <i class="fas fa-arrow-left"></i> 返回
+            </button>
+        </div>
+    </div>
+
+<script>
+// 系统状态管理
+const state = {
+    pressureData: [],
+    currentMusic: null,
+    isBreathing: false
+};
+
+// 界面控制
+function showInterface(name) {
+    document.querySelectorAll('.interface-container').forEach(el => el.style.display = 'none');
+    const target = document.getElementById(`${name}-interface`);
+    target.style.display = 'block';
+    if(name === 'detection') initCanvas();
+}
+
+// 压力检测初始化
+function initCanvas() {
+    const canvas = document.querySelector('.pressure-canvas');
+    const ctx = canvas.getContext('2d');
+    canvas.width = canvas.offsetWidth;
+    canvas.height = canvas.offsetHeight;
+    
+    ctx.lineWidth = 2;
+    ctx.lineCap = 'round';
+    let isDrawing = false;
+    let lastPos = {x: 0, y: 0};
+
+    // 触摸事件处理
+    const handleStart = (x, y) => {
+        isDrawing = true;
+        [lastPos.x, lastPos.y] = [x, y];
+        state.pressureData = [];
+    };
+
+    const handleMove = (x, y) => {
+        if (!isDrawing) return;
+        const speed = Math.sqrt((x - lastPos.x)**2 + (y - lastPos.y)**2);
+        const pressure = Math.min(1, 1 - speed/800);
+        
+        ctx.strokeStyle = `hsl(${pressure * 300}, 70%, 50%)`;
+        ctx.lineWidth = 2 + pressure * 8;
+        
+        ctx.beginPath();
+        ctx.moveTo(lastPos.x, lastPos.y);
+        ctx.lineTo(x, y);
+        ctx.stroke();
+        
+        state.pressureData.push(pressure);
+        [lastPos.x, lastPos.y] = [x, y];
+    };
+
+    // 事件监听
+    canvas.addEventListener('mousedown', e => handleStart(e.offsetX, e.offsetY));
+    canvas.addEventListener('mousemove', e => handleMove(e.offsetX, e.offsetY));
+    canvas.addEventListener('mouseup', () => isDrawing = false);
+}
+
+// 压力分析
+function analyzePressure() {
+    const avg = state.pressureData.reduce((a,b) => a+b, 0) / state.pressureData.length || 0;
+    const level = Math.min(5, Math.ceil(avg * 5));
+    
+    document.getElementById('stress-level').innerHTML = `
+        压力等级：<span style="color:${['#00B894','#6C5CE7','#FF7675'][level-1]}">${level}</span>/5
+    `;
+    
+    let suggestion = '';
+    if(level > 3) {
+        suggestion = `<p style="color:#FF7675">建议立即进行放松训练！</p>`;
+        showContent('breath');
+    }
+    
+    alert(`分析完成！\n平均压力值：${(avg*100).toFixed(1)}%\n推荐措施：${getSuggestion(level)}`);
+}
+
+function getSuggestion(level) {
+    return ['保持当前状态','短暂休息','音乐放松','呼吸训练','专业咨询'][level-1];
+}
+
+// 动态内容生成
+function showContent(type) {
+    const container = document.getElementById('dynamic-content');
+    let content = '';
+    
+    switch(type) {
+        case 'music':
+            content = `
+                <h2>🎵 放松音乐库</h2>
+                <div class="grid-container">
+                    ${['自然之声', 'α波频率', '古典钢琴', '环境音效']
+                        .map((name, i) => `
+                            <div class="music-card" onclick="playMusic(${i})">
+                                <i class="fas fa-music"></i>
+                                <div style="margin-left:1rem;">
+                                    <h4>${name}</h4>
+                                    <p>时长：${3+i}:00</p>
+                                </div>
+                            </div>
+                        `).join('')}
+                </div>
+            `;
+            break;
+            
+        case 'breath':
+            content = `
+                <h2>🌬️ 呼吸训练</h2>
+                <div class="breath-animation">
+                    <div id="breath-circle" style="width:100%;height:100%;border-radius:50%;
+                        background:var(--primary);animation:pulse 4s infinite;"></div>
+                </div>
+                <div style="text-align:center;margin:2rem 0;">
+                    <h3 id="breath-text">准备开始</h3>
+                    <button class="nav-button primary-btn" onclick="startBreath()">
+                        ${state.isBreathing ? '暂停训练' : '开始训练'}
+                    </button>
+                </div>
+            `;
+    }
+    
+    container.innerHTML = content;
+    showInterface('content');
+}
+
+// 呼吸训练系统
+let breathTimer;
+function startBreath() {
+    state.isBreathing = !state.isBreathing;
+    const phases = [
+        {text:"吸气 4秒", color:"#6C5CE7", duration:4000},
+        {text:"屏息 7秒", color:"#00B894", duration:7000},
+        {text:"呼气 8秒", color:"#FF7675", duration:8000}
+    ];
+    
+    if(state.isBreathing) {
+        let phaseIndex = 0;
+        const updatePhase = () => {
+            const current = phases[phaseIndex % 3];
+            document.getElementById('breath-circle').style.background = current.color;
+            document.getElementById('breath-text').textContent = current.text;
+            phaseIndex++;
+            if(state.isBreathing) breathTimer = setTimeout(updatePhase, current.duration);
+        };
+        updatePhase();
+    } else {
+        clearTimeout(breathTimer);
+    }
+}
+
+// 音乐播放系统
+const musicList = [
+    'https://assets.mixkit.co/music/preview/mixkit-forest-flow-29.mp3',
+    'https://assets.mixkit.co/music/preview/mixkit-deep-relaxation-29.mp3',
+    'https://assets.mixkit.co/music/preview/mixkit-piano-melody-111.mp3'
+];
+
+function playMusic(index) {
+    const audio = new Audio(musicList[index]);
+    audio.volume = 0.6;
+    audio.play();
+}
+
+// 初始化显示主界面
+showInterface('main');
+</script>
+</body>
+</html>

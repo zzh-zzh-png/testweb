@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>全周期规划管家</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6C5CE7;
+            --secondary: #00B894;
+            --accent: #FF7675;
+            --background: #F8F9FF;
+            --card-bg: #FFFFFF;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        body {
+            background: var(--background);
+            min-height: 100vh;
+        }
+
+        .header {
+            background: var(--primary);
+            padding: 1rem 2rem;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .container {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        /* 阶段导航面板 */
+        .phase-nav {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+        }
+
+        .phase-progress {
+            height: 6px;
+            background: #eee;
+            border-radius: 3px;
+            margin: 1.5rem 0;
+            position: relative;
+        }
+
+        .phase-progress-bar {
+            height: 100%;
+            background: var(--secondary);
+            border-radius: 3px;
+            transition: width 0.5s ease;
+        }
+
+        .phase-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .phase-item {
+            padding: 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .phase-item::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 3px;
+            background: transparent;
+            transition: all 0.3s;
+        }
+
+        .phase-item.active {
+            background: rgba(108,92,231,0.05);
+        }
+
+        .phase-item.active::before {
+            background: var(--primary);
+        }
+
+        /* 主内容区 */
+        .main-content {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+        }
+
+        .daily-tasks {
+            display: grid;
+            gap: 1.5rem;
+        }
+
+        .task-card {
+            background: var(--background);
+            border-radius: 12px;
+            padding: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            transition: all 0.3s;
+        }
+
+        .task-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+
+        .task-checkbox {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #ddd;
+            border-radius: 4px;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .task-checkbox.checked {
+            background: var(--secondary);
+            border-color: var(--secondary);
+            position: relative;
+        }
+
+        .task-checkbox.checked::after {
+            content: "✓";
+            color: white;
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .time-axis {
+            display: flex;
+            justify-content: space-between;
+            margin: 2rem 0;
+            padding: 1rem;
+            background: var(--background);
+            border-radius: 12px;
+        }
+
+        .time-node {
+            text-align: center;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .time-node.active {
+            background: var(--primary);
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>全周期规划管家</h1>
+        <div class="user-info">
+            <span>剩余天数：<span id="days-left">100</span>天</span>
+            <i class="fas fa-calendar-alt"></i>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- 阶段导航 -->
+        <div class="phase-nav">
+            <h3>学习阶段导航</h3>
+            <div class="phase-progress">
+                <div class="phase-progress-bar" style="width: 30%"></div>
+            </div>
+            <div class="phase-list">
+                <div class="phase-item active" onclick="showPhase('basic')">
+                    <h4>基础阶段</h4>
+                    <p>知识点系统梳理</p>
+                </div>
+                <div class="phase-item" onclick="showPhase('enhance')">
+                    <h4>强化阶段</h4>
+                    <p>真题专项突破</p>
+                </div>
+                <div class="phase-item" onclick="showPhase('sprint')">
+                    <h4>冲刺阶段</h4>
+                    <p>全真模拟演练</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 主内容区 -->
+        <div class="main-content">
+            <div class="time-axis">
+                <div class="time-node active" data-phase="basic">基础阶段<br>Day1-40</div>
+                <div class="time-node" data-phase="enhance">强化阶段<br>Day41-80</div>
+                <div class="time-node" data-phase="sprint">冲刺阶段<br>Day81-100</div>
+            </div>
+
+            <div class="daily-tasks" id="task-container">
+                <!-- 动态生成任务列表 -->
+            </div>
+        </div>
+    </div>
+
+<script>
+// 阶段数据模型
+const phaseSystem = {
+    basic: {
+        days: 40,
+        tasks: [
+            "📚 核心知识点视频学习（2h）",
+            "📝 章节配套练习题（20道）",
+            "🔍 错题本整理（30min）",
+            "📖 预习明日学习内容（30min）"
+        ],
+        color: "#6C5CE7"
+    },
+    enhance: {
+        days: 40,
+        tasks: [
+            "📑 历年真题专项训练（3套）",
+            "📈 得分点分析报告",
+            "🎯 薄弱环节强化训练",
+            "⏱ 时间管理模拟练习"
+        ],
+        color: "#00B894"
+    },
+    sprint: {
+        days: 20,
+        tasks: [
+            "📝 全真模拟考试（3h）",
+            "📊 智能估分与排名",
+            "💡 高频考点速记",
+            "🧘 考前心理调适指南"
+        ],
+        color: "#FF7675"
+    }
+};
+
+// 动态阶段感知算法
+function detectPhase() {
+    const totalDays = 100;
+    const currentDay = parseInt(localStorage.getItem('currentDay')) || 1;
+    
+    if(currentDay <= 40) return 'basic';
+    if(currentDay <= 80) return 'enhance';
+    return 'sprint';
+}
+
+// 生成每日任务
+function generateTasks(phase) {
+    const container = document.getElementById('task-container');
+    container.innerHTML = phaseSystem[phase].tasks.map(task => `
+        <div class="task-card">
+            <div class="task-checkbox" onclick="toggleCheckbox(this)"></div>
+            <div>${task}</div>
+        </div>
+    `).join('');
+}
+
+// 切换阶段显示
+function showPhase(phase) {
+    // 更新导航状态
+    document.querySelectorAll('.phase-item').forEach(item => {
+        item.classList.remove('active');
+    });
+    event.currentTarget.classList.add('active');
+
+    // 更新时间轴
+    document.querySelectorAll('.time-node').forEach(node => {
+        node.classList.remove('active');
+        if(node.dataset.phase === phase) node.classList.add('active');
+    });
+
+    // 生成任务列表
+    generateTasks(phase);
+}
+
+// 任务完成切换
+function toggleCheckbox(checkbox) {
+    checkbox.classList.toggle('checked');
+    saveProgress();
+}
+
+// 保存进度
+function saveProgress() {
+    const progress = [];
+    document.querySelectorAll('.task-checkbox').forEach((box, index) => {
+        progress[index] = box.classList.contains('checked');
+    });
+    localStorage.setItem('taskProgress', JSON.stringify(progress));
+}
+
+// 初始化系统
+function initSystem() {
+    const currentPhase = detectPhase();
+    showPhase(currentPhase);
+    
+    // 加载保存的进度
+    const savedProgress = JSON.parse(localStorage.getItem('taskProgress'));
+    if(savedProgress) {
+        document.querySelectorAll('.task-checkbox').forEach((box, index) => {
+            if(savedProgress[index]) box.classList.add('checked');
+        });
+    }
+}
+
+// 每日更新
+function updateDaily() {
+    const currentDay = parseInt(localStorage.getItem('currentDay')) || 1;
+    localStorage.setItem('currentDay', currentDay + 1);
+    initSystem();
+}
+
+// 初始化
+initSystem();
+
+// 模拟每日更新（实际使用时可定时调用）
+// setInterval(updateDaily, 86400000); // 24小时更新
+</script>
+</body>
+</html>

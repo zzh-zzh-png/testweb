@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>智能题库生成系统</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6C5CE7;
+            --secondary: #A66CFF;
+            --accent: #FF7675;
+            --background: #F8F9FF;
+            --card-bg: #FFFFFF;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        body {
+            background: var(--background);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .input-section {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 3rem;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .search-input {
+            width: 400px;
+            padding: 1rem;
+            border: 2px solid var(--primary);
+            border-radius: 12px;
+            font-size: 1.1rem;
+            margin-right: 1rem;
+        }
+
+        .generate-btn {
+            background: var(--primary);
+            color: white;
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        .generate-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 2rem;
+        }
+
+        .sidebar {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 1.5rem;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+        }
+
+        .question-nav {
+            list-style: none;
+            margin-top: 1rem;
+        }
+
+        .nav-item {
+            padding: 1rem;
+            margin: 0.5rem 0;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .nav-item:hover {
+            background: rgba(108,92,231,0.08);
+        }
+
+        .main-content {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+        }
+
+        .question-card {
+            background: var(--background);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .pagination {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 2rem;
+        }
+
+        .page-btn {
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--primary);
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-item {
+            background: var(--background);
+            padding: 1.5rem;
+            border-radius: 16px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="input-section">
+            <h1>智能题库生成器</h1>
+            <input type="text" class="search-input" placeholder="输入考试类型+学校（例：数一+西南大学）">
+            <button class="generate-btn" onclick="generateQuestions()">
+                <i class="fas fa-magic"></i> 立即生成
+            </button>
+        </div>
+
+        <div id="dashboard" class="dashboard" style="display: none;">
+            <div class="sidebar">
+                <h3>题库导航</h3>
+                <div class="stats">
+                    <div class="stat-item">
+                        <div class="metric">1000</div>
+                        <div class="label">总题量</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="metric">6</div>
+                        <div class="label">知识模块</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="metric">2023</div>
+                        <div class="label">最新年份</div>
+                    </div>
+                </div>
+                <ul class="question-nav" id="questionNav">
+                    <!-- 动态生成导航 -->
+                </ul>
+            </div>
+
+            <div class="main-content" id="mainContent">
+                <!-- 动态生成题目内容 -->
+            </div>
+        </div>
+    </div>
+
+<script>
+// 模拟题库数据
+const questionBank = {
+    "高等数学": [
+        {
+            id: 1,
+            title: "极限计算题",
+            content: "求极限：lim(x→0) (sinx/x)^(1/x²)",
+            answer: "e^(-1/6)",
+            difficulty: "★★★☆",
+            tags: ["极限", "洛必达法则"]
+        },
+        // 更多模拟题目...
+    ],
+    "线性代数": [
+        {
+            id: 101,
+            title: "矩阵求逆",
+            content: "设A为3阶可逆矩阵，|A|=2，求|(3A)^-1|",
+            answer: "1/54",
+            difficulty: "★★☆☆",
+            tags: ["矩阵", "行列式"]
+        }
+    ]
+};
+
+function generateQuestions() {
+    document.getElementById('dashboard').style.display = 'grid';
+    renderNavigation();
+    renderContent('高等数学');
+}
+
+function renderNavigation() {
+    const nav = document.getElementById('questionNav');
+    nav.innerHTML = Object.keys(questionBank).map(category => `
+        <li class="nav-item" onclick="renderContent('${category}')">
+            <i class="fas fa-cube"></i> ${category}
+            <span class="count">(${questionBank[category].length}题)</span>
+        </li>
+    `).join('');
+}
+
+function renderContent(category) {
+    const content = document.getElementById('mainContent');
+    content.innerHTML = `
+        <h2>${category}</h2>
+        ${questionBank[category].map(q => `
+            <div class="question-card">
+                <div class="q-header">
+                    <span class="difficulty">${q.difficulty}</span>
+                    <span class="tags">${q.tags.join(' · ')}</span>
+                </div>
+                <h4>${q.title}</h4>
+                <p>${q.content}</p>
+                <div class="answer" onclick="toggleAnswer(${q.id})">
+                    <i class="fas fa-eye"></i> 显示解析
+                    <div id="answer-${q.id}" class="answer-content" style="display:none;">
+                        <p>答案：${q.answer}</p>
+                    </div>
+                </div>
+            </div>
+        `).join('')}
+        <div class="pagination">
+            <button class="page-btn">1</button>
+            <button class="page-btn">2</button>
+            <button class="page-btn">3</button>
+        </div>
+    `;
+}
+
+function toggleAnswer(id) {
+    const answer = document.getElementById(`answer-${id}`);
+    answer.style.display = answer.style.display === 'none' ? 'block' : 'none';
+}
+</script>
+</body>
+</html>

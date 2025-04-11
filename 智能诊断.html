@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>智能知识图谱系统</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6C5CE7;
+            --secondary: #A66CFF;
+            --accent: #FF7675;
+            --background: #F8F9FF;
+            --card-bg: #FFFFFF;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        body {
+            background: var(--background);
+            min-height: 100vh;
+        }
+
+        /* 新增表头样式 */
+        .header {
+            background: var(--primary);
+            padding: 1rem 2rem;
+            color: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-title {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .container {
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .control-panel {
+            background: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            padding: 2rem;
+        }
+
+        .upload-card {
+            background: linear-gradient(135deg, rgba(108,92,231,0.1) 0%, rgba(166,108,255,0.1) 100%);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            transition: transform 0.3s;
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+
+        .upload-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary);
+        }
+
+        .upload-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .upload-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <!-- 新增表头 -->
+    <div class="header">
+        <div class="header-title">
+            <i class="fas fa-brain"></i>
+            <h1>智能知识图谱系统</h1>
+        </div>
+        <div class="user-info">
+            <span>欢迎，管理员</span>
+            <i class="fas fa-user-circle" style="margin-left: 1rem; font-size: 1.2rem;"></i>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="control-panel">
+            <!-- 题库上传 -->
+            <div class="upload-card" onclick="document.getElementById('qbank-input').click()">
+                <div class="upload-header">
+                    <div class="upload-icon"><i class="fas fa-database"></i></div>
+                    <h3>题库导入</h3>
+                </div>
+                <p>支持CSV/Excel格式，自动提取知识点关联</p>
+                <input type="file" id="qbank-input" hidden accept=".csv,.xlsx">
+            </div>
+
+            <!-- 教材扫描 -->
+            <div class="upload-card" onclick="document.getElementById('textbook-input').click()">
+                <div class="upload-header">
+                    <div class="upload-icon"><i class="fas fa-book-open"></i></div>
+                    <h3>教材扫描</h3>
+                </div>
+                <p>自动识别章节重点，构建知识框架</p>
+                <input type="file" id="textbook-input" hidden accept="image/*">
+            </div>
+
+            <!-- 错题分析 -->
+            <div class="upload-card" onclick="document.getElementById('wrong-input').click()">
+                <div class="upload-header">
+                    <div class="upload-icon"><i class="fas fa-highlighter"></i></div>
+                    <h3>错题分析</h3>
+                </div>
+                <p>智能标注错误步骤，定位薄弱环节</p>
+                <input type="file" id="wrong-input" hidden accept="image/*">
+            </div>
+        </div>
+    </div>
+
+<script>
+// 文件上传处理
+document.getElementById('qbank-input').addEventListener('change', handleFileUpload);
+document.getElementById('textbook-input').addEventListener('change', handleImageUpload);
+document.getElementById('wrong-input').addEventListener('change', handleImageUpload);
+
+function handleFileUpload(e) {
+    const file = e.target.files[0];
+    console.log('上传题库文件:', file.name);
+}
+
+function handleImageUpload(e) {
+    const file = e.target.files[0];
+    const reader = new FileReader();
+    reader.onload = function() {
+        console.log('分析上传图片:', file.name);
+    }
+    reader.readAsDataURL(file);
+}
+</script>
+</body>
+</html>

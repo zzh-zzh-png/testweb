@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>东南大学命题模拟系统</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #5E2D8C;  /* 东南紫 */
+            --secondary: #00B287;  /* 东南绿 */
+            --accent: #FF6B35;
+            --background: #F8F9FF;
+            --card-bg: #FFFFFF;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', '微软雅黑', sans-serif;
+        }
+
+        body {
+            background: var(--background);
+            min-height: 100vh;
+        }
+
+        .navbar {
+            background: linear-gradient(135deg, var(--primary) 0%, #7E4A9B 100%);
+            padding: 1.5rem 2rem;
+            color: white;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+        }
+
+        .navbar h1 {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        /* 步骤导航 */
+        .step-nav {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .step-item {
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            background: rgba(255,255,255,0.9);
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+        }
+
+        .step-item.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        /* 内容卡片 */
+        .content-card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 2.5rem;
+            box-shadow: 0 12px 30px rgba(94,45,140,0.08);
+            margin-bottom: 2rem;
+            transition: transform 0.3s;
+        }
+
+        .content-card:hover {
+            transform: translateY(-5px);
+        }
+
+        /* 输入界面 */
+        .university-input {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+
+        input[type="text"] {
+            padding: 1.2rem;
+            border: 2px solid var(--primary);
+            border-radius: 12px;
+            font-size: 1.1rem;
+            transition: box-shadow 0.3s;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(94,45,140,0.2);
+        }
+
+        .generate-btn {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            padding: 1.2rem 2.5rem;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+            font-weight: 600;
+        }
+
+        .generate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(94,45,140,0.3);
+        }
+
+        /* 试卷预览 */
+        .question-card {
+            border-left: 4px solid var(--primary);
+            padding: 2rem;
+            margin: 2rem 0;
+            background: var(--card-bg);
+            border-radius: 12px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .question-card::before {
+            content: "";
+            position: absolute;
+            left: -4px;
+            top: 0;
+            height: 100%;
+            width: 4px;
+            background: linear-gradient(to bottom, var(--primary), var(--secondary));
+        }
+
+        .hint-tag {
+            display: inline-block;
+            background: rgba(94,45,140,0.1);
+            color: var(--primary);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            margin-top: 1rem;
+            font-size: 0.9em;
+        }
+
+        .chart-container {
+            height: 400px;
+            background: var(--card-bg);
+            border-radius: 16px;
+            margin: 2rem 0;
+            padding: 2rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <h1><i class="fas fa-university"></i> 东南大学命题模拟系统</h1>
+    </div>
+
+    <div class="container">
+        <div class="step-nav">
+            <div class="step-item active" onclick="showStep(1)">1. 院校选择</div>
+            <div class="step-item" onclick="showStep(2)">2. 生成设置</div>
+            <div class="step-item" onclick="showStep(3)">3. 试卷预览</div>
+        </div>
+
+        <!-- 步骤1：院校选择 -->
+        <div id="step1" class="content-card">
+            <h2 style="color: var(--primary); margin-bottom: 1.5rem;">🏫 选择目标院校</h2>
+            <div class="university-input">
+                <input type="text" placeholder="输入「东南大学」进行智能分析" id="universityName">
+                <button class="generate-btn" onclick="analyzePattern()">
+                    <i class="fas fa-chart-line"></i> 智能分析
+                </button>
+            </div>
+            <div class="chart-container" id="trendChart">
+                <!-- 历年命题趋势图表 -->
+            </div>
+        </div>
+
+        <!-- 步骤2：生成设置 -->
+        <div id="step2" class="content-card" style="display:none;">
+            <h2 style="color: var(--primary);">⚙️ 命题参数设置</h2>
+            <div style="margin: 2rem 0;">
+                <label style="display: block; margin-bottom: 1rem; color: var(--primary);">📅 命题年份范围：</label>
+                <select id="years" style="padding: 1rem; border: 2px solid var(--primary); border-radius: 8px; width: 200px;">
+                    <option>近3年</option>
+                    <option selected>近5年</option>
+                    <option>近10年</option>
+                </select>
+            </div>
+            <button class="generate-btn" onclick="generatePaper()">
+                <i class="fas fa-file-alt"></i> 生成模拟试卷
+            </button>
+        </div>
+
+        <!-- 步骤3：试卷预览 -->
+        <div id="step3" class="content-card" style="display:none;">
+            <div style="text-align: center; margin-bottom: 2rem;">
+                <h2 style="color: var(--primary);">东南大学 2024模拟试卷</h2>
+                <div style="color: var(--secondary); margin-top: 0.5rem;">（命题风格模拟系统 v2.0）</div>
+            </div>
+
+            <div class="question-card">
+                <h3 style="color: var(--primary); margin-bottom: 1rem;">【数学分析】</h3>
+                <p>1. （20分）设函数f(x)在[0,1]上二次可导，且f(0)=f(1)=0，证明存在ξ∈(0,1)使得f''(ξ)=4f(ξ)</p>
+                <div class="hint-tag">命题特征：侧重微分中值定理的综合应用</div>
+            </div>
+
+            <div class="question-card">
+                <h3 style="color: var(--primary); margin-bottom: 1rem;">【计算机基础】</h3>
+                <p>2. （25分）设计一个基于二叉搜索树的动态规划算法，解决最优二叉搜索树问题，并分析时间复杂度</p>
+                <div class="hint-tag">命题特征：强调算法设计与复杂性分析</div>
+            </div>
+
+            <button class="generate-btn" onclick="downloadPaper()" style="width: 100%; margin-top: 2rem;">
+                <i class="fas fa-download"></i> 下载完整试卷（PDF格式）
+            </button>
+        </div>
+    </div>
+
+<script>
+// 模拟RAG检索数据
+const universityPatterns = {
+    "东南大学": {
+        features: {
+            math: ["证明题占比45%", "微分方程应用", "复变函数"],
+            computer: ["算法设计", "系统架构", "人工智能基础"],
+            trend: [68, 72, 75, 73, 78] // 近五年难度趋势
+        }
+    }
+};
+
+function showStep(step) {
+    document.querySelectorAll('.content-card').forEach(el => el.style.display = 'none');
+    document.getElementById(`step${step}`).style.display = 'block';
+    
+    document.querySelectorAll('.step-item').forEach((el, index) => {
+        el.classList.toggle('active', index === step-1);
+    });
+}
+
+function analyzePattern() {
+    const university = document.getElementById('universityName').value.trim();
+    if(university === "东南大学") {
+        showStep(2);
+        renderTrendChart(universityPatterns[university].features.trend);
+    } else {
+        alert('请输入「东南大学」进行智能分析');
+    }
+}
+
+function renderTrendChart(data) {
+    const chart = document.getElementById('trendChart');
+    chart.innerHTML = `
+        <div style="padding: 1rem;">
+            <h4 style="color: var(--primary); margin-bottom: 1.5rem;">📈 近五年命题难度趋势</h4>
+            ${data.map((v,i) => `
+                <div style="display: flex; align-items: center; margin: 1.5rem 0;">
+                    <div style="width: 100px; color: var(--secondary);">${2020+i}年</div>
+                    <div style="flex: 1; height: 12px; background: rgba(94,45,140,0.1); border-radius: 6px;">
+                        <div style="width: ${v}%; height: 100%; background: linear-gradient(to right, var(--primary), var(--secondary)); border-radius: 6px; transition: width 1s;"></div>
+                    </div>
+                    <div style="width: 60px; text-align: right; color: var(--primary);">${v}%</div>
+                </div>
+            `).join('')}
+        </div>
+    `;
+}
+
+function generatePaper() {
+    showStep(3);
+}
+
+function downloadPaper() {
+    // 此处应接入PDF生成接口
+    alert('试卷生成成功！下载功能需后端支持');
+}
+</script>
+</body>
+</html>

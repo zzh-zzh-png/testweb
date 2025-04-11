@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>数学卷型DNA适配系统</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6C5CE7;
+            --secondary: #00B894;
+            --accent: #FF7675;
+            --background: #F8F9FF;
+            --card-bg: #FFFFFF;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        body {
+            background: var(--background);
+        }
+
+        .navbar {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            padding: 1.5rem 2rem;
+            color: white;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 100;
+        }
+
+        .container {
+            margin-top: 80px;
+            padding: 2rem;
+            display: grid;
+            gap: 2rem;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+            transition: transform 0.3s;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .dna-selector {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+        }
+
+        .dna-card {
+            text-align: center;
+            padding: 2rem;
+            border: 2px solid transparent;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .dna-card.active {
+            border-color: var(--primary);
+            background: rgba(108,92,231,0.05);
+        }
+
+        .weight-control {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: #eee;
+            border-radius: 4px;
+            flex-grow: 1;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--primary);
+            border-radius: 4px;
+            transition: width 0.5s;
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <h1><i class="fas fa-dna"></i> 数学卷型DNA系统</h1>
+    </div>
+
+    <div class="container">
+        <!-- 卷型选择 -->
+        <div class="card">
+            <h2>选择目标卷型</h2>
+            <div class="dna-selector">
+                <div class="dna-card" onclick="selectDNA('math1')">
+                    <h3>数一卷型</h3>
+                    <p>包含概率论与高数核心</p>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 33%"></div>
+                    </div>
+                </div>
+                <div class="dna-card" onclick="selectDNA('math2')">
+                    <h3>数二卷型</h3>
+                    <p>强化高数与线代</p>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 45%"></div>
+                    </div>
+                </div>
+                <div class="dna-card" onclick="selectDNA('math3')">
+                    <h3>数三卷型</h3>
+                    <p>经济数学专项优化</p>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 28%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 知识点配置 -->
+        <div class="card" id="config-panel" style="display: none;">
+            <h2>知识点适配调整</h2>
+            <div id="knowledge-list"></div>
+            <button onclick="generatePlan()" style="margin-top: 1rem;">生成学习计划</button>
+        </div>
+
+        <!-- 学习计划 -->
+        <div class="card" id="plan-panel" style="display: none;">
+            <h2>个性化学习计划</h2>
+            <div id="plan-content"></div>
+        </div>
+    </div>
+
+<script>
+const dnaConfig = {
+    math1: {
+        core: ["高等数学", "概率统计", "线性代数"],
+        exclude: [],
+        weights: { "选择": 30, "填空": 20, "解答": 50 }
+    },
+    math2: {
+        core: ["高等数学", "线性代数"],
+        exclude: ["概率统计"],
+        weights: { "选择": 40, "填空": 30, "解答": 30 }
+    },
+    math3: {
+        core: ["微积分", "概率统计", "经济数学"],
+        exclude: ["几何"],
+        weights: { "选择": 35, "填空": 25, "解答": 40 }
+    }
+};
+
+let currentDNA = "";
+
+function selectDNA(type) {
+    currentDNA = type;
+    document.querySelectorAll('.dna-card').forEach(c => c.classList.remove('active'));
+    event.target.closest('.dna-card').classList.add('active');
+    
+    // 显示配置面板
+    document.getElementById('config-panel').style.display = 'block';
+    renderKnowledgeConfig();
+}
+
+function renderKnowledgeConfig() {
+    const config = dnaConfig[currentDNA];
+    const html = `
+        <h3>核心知识点</h3>
+        <ul style="color: var(--primary); margin: 1rem 0;">
+            ${config.core.map(k => `<li>${k}</li>`).join('')}
+        </ul>
+        <h3>题型权重调整</h3>
+        ${Object.entries(config.weights).map(([type, value]) => `
+            <div class="weight-control">
+                <span>${type}题</span>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: ${value}%"></div>
+                </div>
+                <input type="number" value="${value}" min="0" max="100" 
+                       onchange="updateWeight('${type}', this.value)" 
+                       style="width: 60px; padding: 0.3rem;">
+            </div>
+        `).join('')}
+    `;
+    document.getElementById('knowledge-list').innerHTML = html;
+}
+
+function updateWeight(type, value) {
+    dnaConfig[currentDNA].weights[type] = parseInt(value);
+    document.querySelector(`input[value="${value}"]`).previousElementSibling
+        .querySelector('.progress-fill').style.width = `${value}%`;
+}
+
+function generatePlan() {
+    const config = dnaConfig[currentDNA];
+    const total = Object.values(config.weights).reduce((a,b) => a+b, 0);
+    
+    const planHTML = `
+        <div style="margin-top: 1rem;">
+            <h3>📅 ${currentDNA.toUpperCase()} 学习计划</h3>
+            <p style="color: var(--secondary);">屏蔽内容：${config.exclude.join('、') || '无'}</p>
+            <div style="display: grid; gap: 1rem; margin-top: 1rem;">
+                ${Object.entries(config.weights).map(([type, val]) => `
+                    <div style="background: rgba(108,92,231,0.1); padding: 1rem; border-radius: 8px;">
+                        ${type}题占比：${(val/total*100).toFixed(1)}%
+                    </div>
+                `).join('')}
+            </div>
+        </div>
+    `;
+    
+    document.getElementById('plan-content').innerHTML = planHTML;
+    document.getElementById('plan-panel').style.display = 'block';
+}
+</script>
+</body>
+</html>

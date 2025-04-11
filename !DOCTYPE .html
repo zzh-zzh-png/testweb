@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>卷型自适应学习系统</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #FF6B6B;
+            --background: #f5f7fa;
+            --card-bg: #ffffff;
+            --text: #333333;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background: var(--background);
+            color: var(--text);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* 导航样式 */
+        .nav-header {
+            background: var(--card-bg);
+            padding: 15px 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-header h1 {
+            font-size: 24px;
+            color: var(--primary);
+        }
+
+        .nav-header button {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        /* 卡片通用样式 */
+        .card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 10px 0;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .card h2 {
+            font-size: 20px;
+            margin-bottom: 10px;
+            color: var(--primary);
+        }
+
+        .card p {
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        /* 隐藏内容 */
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="nav-header">
+        <h1>卷型自适应学习系统</h1>
+        <button onclick="toggleUserType()">切换用户类型</button>
+    </div>
+    <div class="container">
+        <!-- 数一用户界面 -->
+        <div id="math1" class="card">
+            <h2>数一用户 - 概率论强化模块</h2>
+            <p>以下是概率论的核心内容：</p>
+            <ul>
+                <li>随机变量及其分布</li>
+                <li>大数定律与中心极限定理</li>
+                <li>参数估计与假设检验</li>
+            </ul>
+        </div>
+
+        <!-- 数二用户界面 -->
+        <div id="math2" class="card hidden">
+            <h2>数二用户 - 高等数学核心题型</h2>
+            <p>以下是高等数学的核心内容：</p>
+            <ul>
+                <li>极限与连续性</li>
+                <li>微分与积分</li>
+                <li>多元函数微分学</li>
+            </ul>
+        </div>
+
+        <!-- 数三用户界面 -->
+        <div id="math3" class="card hidden">
+            <h2>数三用户 - 线性代数矩阵理论优化</h2>
+            <p>以下是矩阵理论的核心内容：</p>
+            <ul>
+                <li>矩阵的运算与性质</li>
+                <li>特征值与特征向量</li>
+                <li>矩阵的相似与对角化</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        let currentUser = 1; // 默认数一用户
+
+        // 切换用户类型
+        function toggleUserType() {
+            const math1 = document.getElementById('math1');
+            const math2 = document.getElementById('math2');
+            const math3 = document.getElementById('math3');
+
+            currentUser = (currentUser % 3) + 1; // 循环切换用户类型
+
+            // 隐藏所有卡片
+            math1.classList.add('hidden');
+            math2.classList.add('hidden');
+            math3.classList.add('hidden');
+
+            // 显示当前用户卡片
+            if (currentUser === 1) {
+                math1.classList.remove('hidden');
+            } else if (currentUser === 2) {
+                math2.classList.remove('hidden');
+            } else if (currentUser === 3) {
+                math3.classList.remove('hidden');
+            }
+        }
+    </script>
+</body>
+</html>

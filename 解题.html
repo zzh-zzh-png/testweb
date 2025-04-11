@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>智能解题策略优化器</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6C5CE7;
+            --secondary: #00B894;
+            --accent: #FF7675;
+            --background: #F8F9FF;
+            --card-bg: #FFFFFF;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        body {
+            background: var(--background);
+            min-height: 100vh;
+        }
+
+        .header {
+            background: var(--primary);
+            padding: 1rem 2rem;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .header-title {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .container {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        .input-panel {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .upload-section {
+            background: var(--background);
+            border: 2px dashed var(--primary);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .upload-section:hover {
+            background: rgba(108,92,231,0.05);
+            transform: translateY(-2px);
+        }
+
+        textarea {
+            padding: 1rem;
+            border: 2px solid var(--background);
+            border-radius: 12px;
+            resize: vertical;
+            transition: all 0.3s;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(108,92,231,0.1);
+        }
+
+        .analyze-btn {
+            background: var(--primary);
+            color: white;
+            padding: 1rem;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.8rem;
+            transition: all 0.3s;
+        }
+
+        .analyze-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(108,92,231,0.3);
+        }
+
+        .history-section {
+            background: var(--background);
+            border-radius: 12px;
+            padding: 1rem;
+            flex-grow: 1;
+            overflow-y: auto;
+        }
+
+        .history-item {
+            padding: 0.8rem;
+            margin-bottom: 0.8rem;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .history-item:hover {
+            transform: translateX(5px);
+            box-shadow: 2px 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .solution-steps {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+            position: relative;
+        }
+
+        .step-overview {
+            display: grid;
+            gap: 1.5rem;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        }
+
+        .step-card {
+            background: var(--background);
+            border-radius: 12px;
+            padding: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+
+        .step-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(108,92,231,0.1);
+        }
+
+        .step-number {
+            width: 32px;
+            height: 32px;
+            background: var(--primary);
+            color: white;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+        }
+
+        .key-point {
+            color: var(--primary);
+            font-weight: 500;
+            margin-top: 1rem;
+            font-size: 0.9em;
+        }
+
+        .back-btn {
+            background: var(--secondary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 0.8rem 1.5rem;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            transition: all 0.3s;
+        }
+
+        .back-btn:hover {
+            background: #00A383;
+            transform: translateX(-3px);
+        }
+
+        .detail-section {
+            background: var(--background);
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin: 1rem 0;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .step-anchor {
+            position: relative;
+            top: -80px;
+            visibility: hidden;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-title">
+            <i class="fas fa-brain"></i>
+            <h1>考研解题策略优化系统</h1>
+        </div>
+        <div class="user-info">
+            <span>当前用户：考研学子</span>
+            <i class="fas fa-user-graduate"></i>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="input-panel">
+            <div class="upload-section" onclick="document.getElementById('problem-input').click()">
+                <i class="fas fa-upload fa-lg"></i>
+                <p>上传题目图片/文档</p>
+                <input type="file" id="problem-input" hidden accept="image/*,.pdf">
+            </div>
+
+            <textarea placeholder="或直接输入题目内容..." rows="6"></textarea>
+            <button onclick="analyzeProblem()" class="analyze-btn">
+                <i class="fas fa-wand-magic-sparkles"></i>
+                开始智能分析
+            </button>
+
+            <div class="history-section">
+                <h4><i class="fas fa-history"></i> 历史分析记录</h4>
+                <div class="history-list">
+                    <div class="history-item" onclick="loadHistory(1)">
+                        贝叶斯定理应用题 - 2023-07-25
+                    </div>
+                    <div class="history-item" onclick="loadHistory(2)">
+                        微分方程求解 - 2023-07-24
+                    </div>
+                    <div class="history-item" onclick="loadHistory(3)">
+                        矩阵特征值问题 - 2023-07-23
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="solution-steps" id="solution-container">
+            <div class="step-overview" id="step-overview">
+                <div class="step-card" data-step="1" onclick="showStepDetail(1)">
+                    <div class="step-number">1</div>
+                    <h3>题干解析</h3>
+                    <div class="key-point">识别题目类型与核心考点</div>
+                </div>
+                <div class="step-card" data-step="2" onclick="showStepDetail(2)">
+                    <div class="step-number">2</div>
+                    <h3>策略选择</h3>
+                    <div class="key-point">匹配最佳解题模板</div>
+                </div>
+                <div class="step-card" data-step="3" onclick="showStepDetail(3)">
+                    <div class="step-number">3</div>
+                    <h3>规范作答</h3>
+                    <div class="key-point">步骤分拆解与易错点</div>
+                </div>
+            </div>
+
+            <div class="step-detail" id="step-detail" style="display: none;">
+                <button onclick="backToOverview()" class="back-btn">
+                    <i class="fas fa-arrow-left"></i>
+                    返回概览
+                </button>
+                <div id="detail-content">
+                    <!-- 动态生成的内容锚点 -->
+                    <div class="step-anchor" id="step-1"></div>
+                    <div class="detail-section" id="content-1"></div>
+                    
+                    <div class="step-anchor" id="step-2"></div>
+                    <div class="detail-section" id="content-2"></div>
+                    
+                    <div class="step-anchor" id="step-3"></div>
+                    <div class="detail-section" id="content-3"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<script>
+const solutionData = {
+    1: {
+        title: "题干解析",
+        content: [
+            "📌 题目类型识别：概率论-贝叶斯定理应用",
+            "🔍 关键条件提取：",
+            "• 基础患病率：0.1%",
+            "• 检测准确率：99%",
+            "• 检测结果为阳性",
+            "🎯 考查重点：条件概率的实际应用",
+            "📊 相关知识点图谱：概率公式推导、医疗检测模型"
+        ]
+    },
+    2: {
+        title: "策略选择",
+        content: [
+            "📚 推荐模板：医疗检测型贝叶斯问题",
+            "⚙️ 计算路径：",
+            "1. 定义事件：A=患病，B=阳性",
+            "2. 计算P(B) = P(B|A)P(A) + P(B|¬A)P(¬A)",
+            "3. 代入贝叶斯公式计算P(A|B)",
+            "⚠️ 易错预警：不要忽略基础概率",
+            "💡 替代方案：决策树分析法"
+        ]
+    },
+    3: {
+        title: "规范作答",
+        content: [
+            "📝 标准作答步骤：",
+            "① 明确公式：P(A|B) = [P(B|A)P(A)] / P(B)",
+            "② 数值代入：",
+            "   P(B|A)=0.99, P(A)=0.001",
+            "   P(B|¬A)=0.01, P(¬A)=0.999",
+            "③ 计算结果：≈9%",
+            "⭐ 得分要点：公式书写完整、单位统一",
+            "❌ 典型错误：直接使用检测准确率作为患病概率"
+        ]
+    }
+};
+
+function analyzeProblem() {
+    // 生成所有步骤内容
+    [1,2,3].forEach(step => {
+        const contentDiv = document.getElementById(`content-${step}`);
+        contentDiv.innerHTML = `
+            <h2>${solutionData[step].title}</h2>
+            ${solutionData[step].content.map(c => `<p>${c}</p>`).join('')}
+        `;
+    });
+    
+    document.getElementById('step-overview').style.display = 'grid';
+    document.getElementById('step-detail').style.display = 'none';
+}
+
+function showStepDetail(stepNum) {
+    document.getElementById('step-overview').style.display = 'none';
+    document.getElementById('step-detail').style.display = 'block';
+    
+    // 滚动到对应锚点
+    const anchor = document.getElementById(`step-${stepNum}`);
+    anchor.scrollIntoView({ behavior: 'smooth' });
+}
+
+function backToOverview() {
+    document.getElementById('step-overview').style.display = 'grid';
+    document.getElementById('step-detail').style.display = 'none';
+}
+
+function loadHistory(id) {
+    const exampleData = {
+        1: "某疾病患病率为0.1%，检测准确率99%。若某人检测结果为阳性，求实际患病概率。",
+        2: "求解微分方程：y'' + 4y' + 3y = 0",
+        3: "求矩阵A = [[2,1],[1,2]]的特征值和特征向量"
+    };
+    document.querySelector('textarea').value = exampleData[id];
+    analyzeProblem();
+}
+
+// 初始化生成内容
+analyzeProblem();
+</script>
+</body>
+</html>

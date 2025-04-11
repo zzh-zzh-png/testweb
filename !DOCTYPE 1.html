@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>数一专项练习 - 番茄模式</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+
+        body {
+            background: #f5f5f5;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: #ee5555;
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 12px rgba(238,85,85,0.15);
+        }
+
+        .task-card {
+            background: white;
+            border-radius: 12px;
+            padding: 18px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            position: relative;
+        }
+
+        .task-title {
+            color: #333;
+            font-size: 18px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+        }
+
+        .task-title i {
+            color: #ee5555;
+            margin-right: 10px;
+            font-size: 20px;
+        }
+
+        .task-sub {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 12px;
+        }
+
+        .progress-bar {
+            height: 4px;
+            background: #eee;
+            border-radius: 2px;
+            margin: 10px 0;
+        }
+
+        .progress {
+            width: 33%;
+            height: 100%;
+            background: #ee5555;
+            border-radius: 2px;
+            transition: width 0.3s;
+        }
+
+        .btn-start {
+            background: #ee5555;
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 20px;
+            float: right;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .btn-start:hover {
+            transform: scale(1.05);
+        }
+
+        .priority-tag {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: #ffeeee;
+            color: #ee5555;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h2>数一卷型专项练习</h2>
+            <p>已开启2个训练计划</p>
+        </div>
+
+        <div class="task-card">
+            <div class="task-title">
+                <i class="fas fa-calculator"></i>
+                三重积分专项突破
+            </div>
+            <div class="task-sub">每日完成3题训练</div>
+            <div class="progress-bar">
+                <div class="progress"></div>
+            </div>
+            <div class="task-sub">今日进度：1/3</div>
+            <button class="btn-start">开始训练</button>
+        </div>
+
+        <div class="task-card">
+            <div class="priority-tag">优先推送</div>
+            <div class="task-title">
+                <i class="fas fa-chart-bar"></i>
+                随机变量分布大题库
+            </div>
+            <div class="task-sub">最新题目优先推送</div>
+            <div class="progress-bar">
+                <div class="progress" style="width: 65%"></div>
+            </div>
+            <div class="task-sub">本周进度：13/20</div>
+            <button class="btn-start">开始练习</button>
+        </div>
+    </div>
+</body>
+</html>
+<!-- 三重积分按钮 -->
+<button class="btn-start" onclick="location.href='triple_integral.html'">开始训练</button>
+
+<!-- 随机变量按钮 -->
+<button class="btn-start" onclick="location.href='random_variable.html'">开始练习</button>
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <meta charset="UTF-8">
+    <title>三重积分专项训练</title>
+    <style>
+        /* 保持与主界面一致的样式 */
+        body { 
+            padding: 20px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+        .question-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 15px 0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .btn-back {
+            background: #ee5555;
+            color: white;
+            padding: 8px 20px;
+            border-radius: 20px;
+            text-decoration: none;
+            display: inline-block;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <a href="index.html" class="btn-back">返回主界面</a>
+    
+    <div class="question-card">
+        <h3>【题目1】计算三重积分</h3>
+        <p>∭<sub>Ω</sub>(x² + y²) dv，其中Ω由z=√(x²+y²)与z=1围成</p>
+        <p>📝 答题区：<input type="text" placeholder="输入答案"></p>
+    </div>
+
+    <div class="question-card">
+        <h3>【题目2】柱坐标系积分</h3>
+        <p>∭<sub>Ω</sub> r³ sinθ dz dr dθ 积分区域0≤θ≤π/2, 0≤r≤2, 0≤z≤4</p>
+        <p>📝 答题区：<input type="text" placeholder="输入答案"></p>
+    </div>
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <meta charset="UTF-8">
+    <title>随机变量专项训练</title>
+    <style>
+        body { 
+            padding: 20px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+        .question-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 15px 0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .options {
+            margin: 10px 0;
+        }
+        input[type="radio"] {
+            margin-right: 8px;
+        }
+    </style>
+</head>
+<body>
+    <a href="index.html" class="btn-back">返回主界面</a>
+
+    <div class="question-card">
+        <h3>【题目1】正态分布计算</h3>
+        <p>设X~N(2,4)，求P(0 < X < 3)</p>
+        <div class="options">
+            <input type="radio" name="q1" id="q1a"> <label for="q1a">A. 0.3721</label><br>
+            <input type="radio" name="q1" id="q1b"> <label for="q1b">B. 0.4332</label><br>
+            <input type="radio" name="q1" id="q1c"> <label for="q1c">C. 0.1498</label>
+        </div>
+    </div>
+
+    <div class="question-card">
+        <h3>【题目2】联合分布函数</h3>
+        <p>设(X,Y)的联合密度函数为f(x,y)=kxy, 0<x<1, 0<y<1，求常数k</p>
+        <p>📝 答题区：<input type="text" placeholder="输入答案"></p>
+    </div>
+</body>
+</html>

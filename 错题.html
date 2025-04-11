@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>智能错题重组系统</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #7B68EE;
+            --secondary: #00CED1;
+            --accent: #FF7F50;
+            --background: #F8F9FF;
+            --glass: rgba(255,255,255,0.96);
+            --shadow: 0 12px 24px -8px rgba(0,0,0,0.08);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI Variable', system-ui, sans-serif;
+        }
+
+        body {
+            background: var(--background);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--primary) 0%, #6A5ACD 100%);
+            padding: 2rem 3rem;
+            color: white;
+            border-radius: 0 0 24px 24px;
+            box-shadow: var(--shadow);
+        }
+
+        .progress-steps {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            max-width: 1000px;
+            margin: 2rem auto;
+        }
+
+        .step-indicator {
+            padding: 1.5rem;
+            border-radius: 16px;
+            background: rgba(255,255,255,0.15);
+            text-align: center;
+            transition: all 0.3s;
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+
+        .step-indicator.active {
+            background: var(--glass);
+            color: var(--primary);
+            transform: translateY(-5px);
+            box-shadow: var(--shadow);
+        }
+
+        .container {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        .workspace-panel {
+            background: var(--glass);
+            border-radius: 24px;
+            padding: 2.5rem;
+            box-shadow: var(--shadow);
+            margin: 1rem 0;
+        }
+
+        .gene-map {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .gene-card {
+            background: var(--glass);
+            padding: 1.5rem;
+            border-radius: 16px;
+            border-left: 4px solid var(--primary);
+            transition: all 0.3s;
+        }
+
+        .gene-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 24px rgba(123,104,238,0.1);
+        }
+
+        .variant-generator {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .variant-card {
+            background: var(--glass);
+            padding: 1.5rem;
+            border-radius: 16px;
+            border: 1px solid rgba(123,104,238,0.1);
+            transition: all 0.3s;
+        }
+
+        .variant-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.05);
+        }
+
+        .control-panel {
+            background: var(--glass);
+            padding: 2rem;
+            border-radius: 16px;
+            margin-top: 2rem;
+        }
+
+        .param-slider {
+            display: grid;
+            grid-template-columns: 120px 1fr;
+            align-items: center;
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1 style="font-size: 2.5rem; margin-bottom: 0.5rem;">
+            <i class="fas fa-brain-circuit"></i> 智能错题重组系统
+        </h1>
+        <p style="opacity: 0.95;">基于RAG的知识图谱增强型错题变异引擎</p>
+        
+        <div class="progress-steps">
+            <div class="step-indicator active" onclick="showStep(1)">
+                <i class="fas fa-book-medical"></i>
+                <h3>错题录入</h3>
+            </div>
+            <div class="step-indicator" onclick="showStep(2)">
+                <i class="fas fa-dna"></i>
+                <h3>基因分析</h3>
+            </div>
+            <div class="step-indicator" onclick="showStep(3)">
+                <i class="fas fa-cogs"></i>
+                <h3>智能生成</h3>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- 步骤1：错题录入 -->
+        <div class="workspace-panel" id="step1-panel">
+            <h2 class="panel-title"><i class="fas fa-file-import"></i> 错题录入面板</h2>
+            <textarea placeholder="请输入或粘贴错题内容..." rows="8"></textarea>
+            <div class="upload-controls">
+                <button class="analyze-btn" onclick="analyzeError()">
+                    <i class="fas fa-microscope"></i> 开始智能分析
+                </button>
+                <div class="file-upload">
+                    <input type="file" hidden id="file-upload">
+                    <label for="file-upload">
+                        <i class="fas fa-cloud-upload-alt"></i> 上传错题文档
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <!-- 步骤2：基因分析 -->
+        <div class="workspace-panel" id="step2-panel" style="display:none;">
+            <h2 class="panel-title"><i class="fas fa-dna"></i> 错题基因图谱</h2>
+            <div class="gene-map" id="gene-map"></div>
+            
+            <div class="control-panel">
+                <h3><i class="fas fa-sliders-h"></i> 变异参数控制</h3>
+                <div class="param-slider">
+                    <label>难度系数：</label>
+                    <input type="range" min="1" max="5" value="3">
+                </div>
+                <div class="param-slider">
+                    <label>结构变异：</label>
+                    <input type="range" min="1" max="5" value="3">
+                </div>
+                <button class="generate-btn" onclick="generateVariants()">
+                    <i class="fas fa-magic"></i> 生成变式题组
+                </button>
+            </div>
+        </div>
+
+        <!-- 步骤3：智能生成 -->
+        <div class="workspace-panel" id="step3-panel" style="display:none;">
+            <h2 class="panel-title"><i class="fas fa-cogs"></i> 智能变式工厂</h2>
+            <div class="variant-generator" id="variant-container"></div>
+            
+            <div class="knowledge-graph">
+                <h3><i class="fas fa-project-diagram"></i> 关联知识图谱</h3>
+                <div id="knowledge-graph"></div>
+            </div>
+        </div>
+    </div>
+
+<script>
+const knowledgeGraph = {
+    nodes: [
+        { id: "导数应用", group: 1 },
+        { id: "概率基础", group: 2 },
+        { id: "极值定理", group: 1 },
+        { id: "贝叶斯定理", group: 2 }
+    ],
+    links: [
+        { source: "导数应用", target: "极值定理", strength: 0.9 },
+        { source: "概率基础", target: "贝叶斯定理", strength: 0.85 }
+    ]
+};
+
+function analyzeError() {
+    showStep(2);
+    
+    const genes = [
+        { title: "核心知识点", value: "导数应用", weight: 0.88 },
+        { title: "错误类型", value: "临界点误判", weight: 0.92 },
+        { title: "认知缺陷", value: "二阶导数验证缺失", weight: 0.85 },
+        { title: "关联概念", value: "微分中值定理", weight: 0.78 }
+    ];
+
+    const mapDiv = document.getElementById('gene-map');
+    mapDiv.innerHTML = genes.map(g => `
+        <div class="gene-card">
+            <div class="gene-header">
+                <h4>${g.title}</h4>
+                <span class="weight">${Math.round(g.weight*100)}%</span>
+            </div>
+            <div class="gene-value">${g.value}</div>
+            <div class="progress-bar" style="width:${g.weight*100}%"></div>
+        </div>
+    `).join('');
+}
+
+function generateVariants() {
+    showStep(3);
+    
+    const variants = [
+        {
+            title: "基础巩固题",
+            content: "求函数f(x)=x³-3x²在区间[-1,3]上的极值点",
+            difficulty: 2,
+            tags: ["计算", "单变量"]
+        },
+        {
+            title: "进阶应用题",
+            content: "证明函数g(x)=eˣ - x³在x>2时单调递增",
+            difficulty: 4,
+            tags: ["证明", "指数函数"]
+        }
+    ];
+
+    const container = document.getElementById('variant-container');
+    container.innerHTML = variants.map(v => `
+        <div class="variant-card">
+            <div class="variant-header">
+                <h4>${v.title}</h4>
+                <div class="meta">
+                    <span class="difficulty">难度：${'★'.repeat(v.difficulty)}</span>
+                    <div class="tags">${v.tags.map(t => `<span>#${t}</span>`).join('')}</div>
+                </div>
+            </div>
+            <div class="content">${v.content}</div>
+            <div class="actions">
+                <button onclick="showSolution(this)"><i class="fas fa-lightbulb"></i> 解析</button>
+                <button onclick="regenerate(this)"><i class="fas fa-redo"></i> 再生</button>
+            </div>
+        </div>
+    `).join('');
+
+    renderKnowledgeGraph();
+}
+
+function renderKnowledgeGraph() {
+    const graphDiv = document.getElementById('knowledge-graph');
+    graphDiv.innerHTML = knowledgeGraph.nodes.map(n => `
+        <div class="node">
+            <div class="node-title">${n.id}</div>
+            ${knowledgeGraph.links
+                .filter(l => l.source === n.id)
+                .map(l => `<div class="link">→ ${l.target} (强度 ${l.strength})</div>`)
+                .join('')}
+        </div>
+    `).join('');
+}
+
+function showStep(step) {
+    document.querySelectorAll('.step-indicator').forEach((el,index) => {
+        el.classList.toggle('active', index+1 === step);
+    });
+    document.getElementById('step1-panel').style.display = step===1 ? 'block' : 'none';
+    document.getElementById('step2-panel').style.display = step===2 ? 'block' : 'none';
+    document.getElementById('step3-panel').style.display = step===3 ? 'block' : 'none';
+}
+
+function showSolution(btn) {
+    const card = btn.closest('.variant-card');
+    const solution = document.createElement('div');
+    solution.className = 'solution';
+    solution.innerHTML = `
+        <div class="solution-content">
+            <h5>解题导航：</h5>
+            <ul>
+                <li>确定函数定义域</li>
+                <li>计算一阶导数</li>
+                <li>寻找临界点</li>
+                <li>验证极值性质</li>
+            </ul>
+        </div>
+    `;
+    card.appendChild(solution);
+}
+
+function regenerate(btn) {
+    const card = btn.closest('.variant-card');
+    card.classList.add('regenerating');
+    setTimeout(() => {
+        card.classList.remove('regenerating');
+        card.querySelector('.content').innerText = 
+            "新生成题目：" + Math.random().toString(36).substring(2,7);
+    }, 500);
+}
+</script>
+</body>
+</html>
