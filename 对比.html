@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI备考系统深度对比</title>
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #27ae60;
+            --accent: #e74c3c;
+            --light: #f8f9fa;
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui;
+        }
+
+        body {
+            line-height: 1.6;
+            scroll-behavior: smooth;
+            background: #f5f7fa;
+        }
+
+        .nav-container {
+            background: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-menu {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            padding: 1rem;
+            gap: 2rem;
+            overflow-x: auto;
+        }
+
+        .nav-link {
+            color: var(--primary);
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            transition: var(--transition);
+            white-space: nowrap;
+        }
+
+        .nav-link:hover {
+            background: var(--secondary);
+            color: white;
+        }
+
+        .nav-link.active {
+            background: var(--secondary);
+            color: white;
+        }
+
+        .global-problem {
+            background: linear-gradient(135deg, #e8f4fc 0%, #f0faf4 100%);
+            padding: 2rem;
+            margin: 2rem auto;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 800px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+            border: 3px solid var(--secondary);
+        }
+
+        .problem-title {
+            font-size: 1.5rem;
+            color: var(--primary);
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .problem-content {
+            font-family: monospace;
+            font-size: 1.1rem;
+            color: #2c3e50;
+            line-height: 1.8;
+            text-align: center;
+        }
+
+        .section {
+            padding: 4rem 1rem;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 2rem;
+            color: var(--primary);
+            margin-bottom: 3rem;
+            position: relative;
+        }
+
+        .section-title::after {
+            content: '';
+            width: 60px;
+            height: 3px;
+            background: var(--secondary);
+            position: absolute;
+            bottom: -1rem;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .compare-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            padding: 1rem;
+        }
+
+        .system-card {
+            background: white;
+            border-radius: 16px;
+            padding: 1.5rem;
+            transition: var(--transition);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+
+        .system-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .system-card.traditional {
+            border: 2px solid #e74c3c33;
+            background: #fff5f5;
+        }
+
+        .system-card.smart {
+            border: 2px solid #27ae6033;
+            background: #f0faf4;
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .card-icon {
+            font-size: 2rem;
+        }
+
+        .detail-point {
+            padding: 0.8rem;
+            margin: 0.5rem 0;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .error-msg, .success-msg {
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+        }
+
+        .error-msg {
+            background: #fee;
+            border: 1px solid #fcc;
+        }
+
+        .success-msg {
+            background: #efffed;
+            border: 1px solid #cfc;
+        }
+
+        /* 学习路径样式 */
+        .learning-path {
+            max-width: 800px;
+            margin: 2rem auto;
+            position: relative;
+            padding-left: 60px;
+        }
+
+        .path-step {
+            padding: 1.5rem;
+            margin: 2rem 0;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            position: relative;
+            border-left: 4px solid var(--secondary);
+        }
+
+        .step-number {
+            width: 32px;
+            height: 32px;
+            background: var(--secondary);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: absolute;
+            left: -46px;
+            top: 1.5rem;
+        }
+
+        /* 诊断检测样式 */
+        .diagnosis-grid {
+            display: grid;
+            gap: 1.5rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            padding: 0 1rem;
+        }
+
+        .diagnosis-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+
+        .diagnosis-progress {
+            height: 8px;
+            background: #eee;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 1rem 0;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: var(--secondary);
+            width: 75%;
+            transition: var(--transition);
+        }
+
+        .recommend-list {
+            list-style: none;
+            padding-left: 1.5rem;
+        }
+
+        .recommend-list li {
+            position: relative;
+            margin: 0.5rem 0;
+            padding-left: 1.5rem;
+        }
+
+        .recommend-list li::before {
+            content: "▹";
+            color: var(--secondary);
+            position: absolute;
+            left: 0;
+        }
+
+        @media (max-width: 768px) {
+            .learning-path {
+                padding-left: 2rem;
+            }
+            .step-number {
+                left: -32px;
+            }
+            .nav-menu {
+                gap: 1rem;
+                padding: 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="nav-container">
+        <div class="nav-menu">
+            <a href="#knowledge" class="nav-link active">知识关联</a>
+            <a href="#problem" class="nav-link">解题思维</a>
+            <a href="#learning" class="nav-link">学习路径</a>
+            <a href="#diagnosis" class="nav-link">诊断检测</a>
+        </div>
+    </nav>
+
+    <div class="global-problem">
+        <div class="problem-title">📚 核心例题：二次函数综合应用</div>
+        <div class="problem-content">
+            已知函数 f(x) = ax² + bx + c 满足：
+            <br>➊ 过点 (1, 3) 
+            <br>➋ 过点 (2, 0) 
+            <br>➌ 在 x=3 处取得极值
+            <br>求系数 a, b, c 的值
+        </div>
+    </div>
+
+    <!-- 知识关联模块 -->
+    <section id="knowledge" class="section">
+        <h2 class="section-title">知识关联对比</h2>
+        <div class="compare-container">
+            <div class="system-card traditional">
+                <div class="card-header">
+                    <div class="card-icon">❌</div>
+                    <h3 class="card-title">传统AI系统</h3>
+                </div>
+                <div class="card-content">
+                    <div class="detail-point">
+                        <strong>孤立知识点：</strong>
+                        <ul>
+                            <li>单独讲解二次函数标准式</li>
+                            <li>独立教学顶点坐标公式</li>
+                            <li>方程解法单独作为章节</li>
+                        </ul>
+                    </div>
+                    <div class="error-msg">⚠️ 学生需要自行建立知识联系</div>
+                </div>
+            </div>
+
+            <div class="system-card smart">
+                <div class="card-header">
+                    <div class="card-icon">✅</div>
+                    <h3 class="card-title">智能备考系统</h3>
+                </div>
+                <div class="card-content">
+                    <div class="detail-point">
+                        <strong>动态知识网络：</strong>
+                        <ul>
+                            <li>函数式 ↔ 图像特征实时联动</li>
+                            <li>极值点 ↔ 导数概念自动关联</li>
+                            <li>方程求解 ↔ 矩阵运算双向映射</li>
+                        </ul>
+                    </div>
+                    <div class="success-msg">💡 系统自动构建知识图谱</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 解题思维模块 -->
+    <section id="problem" class="section">
+        <h2 class="section-title">解题思维对比</h2>
+        <div class="compare-container">
+            <div class="system-card traditional">
+                <div class="card-header">
+                    <div class="card-icon">❌</div>
+                    <h3 class="card-title">传统解题过程</h3>
+                </div>
+                <div class="card-content">
+                    <div class="detail-point">
+                        <strong>直接输出结果：</strong>
+                        <pre>a = 1
+b = -6
+c = 8</pre>
+                    </div>
+                    <div class="error-msg">
+                        ⚠️ 缺失关键步骤：
+                        <ul>
+                            <li>方程组建立过程</li>
+                            <li>导数应用方法</li>
+                            <li>矩阵化简步骤</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="system-card smart">
+                <div class="card-header">
+                    <div class="card-icon">✅</div>
+                    <h3 class="card-title">智能解题引导</h3>
+                </div>
+                <div class="card-content">
+                    <div class="detail-point">
+                        <strong>分步拆解：</strong>
+                        <ol>
+                            <li>代入(1,3)：a + b + c = 3</li>
+                            <li>代入(2,0)：4a + 2b + c = 0</li>
+                            <li>求导得：f'(x)=2ax+b ⇒ 6a + b = 0</li>
+                            <li>矩阵解法演示：
+                                <pre>[[1,1,1,3],
+[4,2,1,0],
+[6,1,0,0]]</pre>
+                            </li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 学习路径模块 -->
+    <section id="learning" class="section">
+        <h2 class="section-title">智能学习路径</h2>
+        <div class="learning-path">
+            <div class="path-step">
+                <div class="step-number">1</div>
+                <h3>基础夯实</h3>
+                <p>二次函数基本性质与图像分析</p>
+                <ul class="recommend-list">
+                    <li>顶点式专项训练</li>
+                    <li>判别式应用练习</li>
+                </ul>
+            </div>
+            <div class="path-step">
+                <div class="step-number">2</div>
+                <h3>能力进阶</h3>
+                <p>导数与极值综合应用</p>
+                <ul class="recommend-list">
+                    <li>导数几何意义专题</li>
+                    <li>极值应用题精讲</li>
+                </ul>
+            </div>
+            <div class="path-step">
+                <div class="step-number">3</div>
+                <h3>综合突破</h3>
+                <p>线性代数与方程组的综合运用</p>
+                <ul class="recommend-list">
+                    <li>矩阵运算工作坊</li>
+                    <li>方程组建模训练</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- 诊断检测模块 -->
+    <section id="diagnosis" class="section">
+        <h2 class="section-title">学情诊断报告</h2>
+        <div class="diagnosis-grid">
+            <div class="diagnosis-card">
+                <h3>知识掌握度</h3>
+                <div class="diagnosis-progress">
+                    <div class="progress-bar" style="width: 85%"></div>
+                </div>
+                <p>二次函数基础：85%</p>
+                <p>导数应用：78%</p>
+            </div>
+            <div class="diagnosis-card">
+                <h3>薄弱环节分析</h3>
+                <ul class="recommend-list">
+                    <li>极值点偏移问题</li>
+                    <li>含参方程组求解</li>
+                    <li>矩阵化简技巧</li>
+                </ul>
+            </div>
+            <div class="diagnosis-card">
+                <h3>推荐提升方案</h3>
+                <ul class="recommend-list">
+                    <li>每日专题精练（3题）</li>
+                    <li>错题重做机制</li>
+                    <li>智能组卷测试</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        // 平滑滚动效果
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+
+        // 导航栏激活状态
+        window.addEventListener('scroll', () => {
+            const sections = document.querySelectorAll('section');
+            const navLinks = document.querySelectorAll('.nav-link');
+            
+            sections.forEach(sec => {
+                const top = window.scrollY;
+                const offset = sec.offsetTop - 100;
+                const height = sec.offsetHeight;
+                const id = sec.getAttribute('id');
+
+                if (top >= offset && top < offset + height) {
+                    navLinks.forEach(link => {
+                        link.classList.remove('active');
+                        if(link.getAttribute('href') === `#${id}`) {
+                            link.classList.add('active');
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
